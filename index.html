@@ -5,470 +5,513 @@
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
  <title>Kensington Data Dashboard</title>
  <style>
-  body {
-   font-family: Arial, sans-serif;
-   margin: 0;
-   padding: 20px;
-   background-color: #f5f5f5;
-  }
-   
-  .dashboard-container {
-   max-width: 1200px;
-   margin: 0 auto;
-  }
-   
-  .section {
-   background: white;
-   margin-bottom: 30px;
-   border-radius: 8px;
-   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-   overflow: hidden;
-  }
-   
-  .section-header {
-   background-color: #2c3e50;
-   color: white;
-   padding: 15px 20px;
-   font-size: 18px;
-   font-weight: bold;
-  }
-   
-  .loading-message {
-   padding: 20px;
-   text-align: center;
-   color: #666;
-   font-style: italic;
-  }
-   
-  .data-container {
-   max-height: 400px;
-   overflow-y: auto;
-   display: none;
-  }
-   
-  table {
-   width: 100%;
-   border-collapse: collapse;
-  }
-   
-  th {
-   background-color: #34495e;
-   color: white;
-   padding: 12px 8px;
-   text-align: left;
-   font-size: 12px;
-   position: sticky;
-   top: 0;
-  }
-   
-  td {
-   padding: 10px 8px;
-   border-bottom: 1px solid #eee;
-   font-size: 12px;
-  }
-   
-  tr:hover {
-   background-color: #f8f9fa;
-  }
-   
-  .error-message {
-   padding: 20px;
-   color: #e74c3c;
-   text-align: center;
-   display: none;
-  }
-   
-  .disclaimer {
-   padding: 10px 20px;
-   font-style: italic;
-   color: #666;
-   font-size: 12px;
-   background-color: #f9f9f9;
-   margin-bottom: 30px;
-  }
+ body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #f5f5f5;
+ }
+  
+ .dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+ }
+  
+ .section {
+  background: white;
+  margin-bottom: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: hidden;
+ }
+  
+ .section-header {
+  background-color: #2c3e50;
+  color: white;
+  padding: 15px 20px;
+  font-size: 18px;
+  font-weight: bold;
+ }
+  
+ .loading-message {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+ }
+
+ /* Spinner CSS */
+ .spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #2c3e50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+ }
+
+ @keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+ }
+  
+ .data-container {
+  max-height: 400px;
+  overflow-y: auto;
+  display: none;
+ }
+  
+ table {
+  width: 100%;
+  border-collapse: collapse;
+ }
+  
+ th {
+  background-color: #34495e;
+  color: white;
+  padding: 12px 8px;
+  text-align: left;
+  font-size: 12px;
+  position: sticky;
+  top: 0;
+ }
+  
+ td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 12px;
+ }
+  
+ tr:hover {
+  background-color: #f8f9fa;
+ }
+  
+ .error-message {
+  padding: 20px;
+  color: #e74c3c;
+  text-align: center;
+  display: none;
+ }
+  
+ .disclaimer {
+  padding: 10px 20px;
+  font-style: italic;
+  color: #666;
+  font-size: 12px;
+  background-color: #f9f9f9;
+  margin-bottom: 30px;
+ }
  </style>
 </head>
 <body>
  <div class="dashboard-container">
-  <h1 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">Kensington Data Dashboard</h1>
-   
-  <!-- 311 Requests Section -->
-  <div class="section">
-   <div class="section-header">311 Requests (Kensington) **</div>
-   <div class="loading-message" id="loading-311">Loading 311 requests data, please be patient...</div>
-   <div class="error-message" id="error-311">Error loading data. Please try again later.</div>
-   <div class="data-container" id="data-311">
-    <table>
-     <thead>
-      <tr>
-       <th>Created Date</th>
-       <th>Status ID</th>
-       <th>Area</th>
-       <th>Sub Area</th>
-       <th>FAQ Question</th>
-       <th>City</th>
-       <th>State</th>
-       <th>Zip Code</th>
-      </tr>
-     </thead>
-     <tbody id="tbody-311"></tbody>
-    </table>
-   </div>
-  </div>
+ <h1 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">Kensington Data Dashboard</h1>
   
-  <div class="disclaimer">
-   ** Does not include bulk trash requests, scrap metal requests, and 22-gallon bin deliveries.
+ <!-- 311 Requests Section -->
+ <div class="section">
+  <div class="section-header">311 Requests (Kensington) **</div>
+  <div class="loading-message" id="loading-311">
+   <div class="spinner"></div>
+   Loading 311 requests data, please be patient...
   </div>
-
-  <!-- Fire Station Responses Section -->
-  <div class="section">
-   <div class="section-header">Fire Station Responses (Kensington)</div>
-   <div class="loading-message" id="loading-fire">Loading fire station response data, please be patient...</div>
-   <div class="error-message" id="error-fire">Error loading data. Please try again later.</div>
-   <div class="data-container" id="data-fire">
-    <table>
-     <thead>
-      <tr>
-       <th>Fire Station Number</th>
-       <th>Call Type Description</th>
-       <th>Date</th>
-       <th>Time</th>
-      </tr>
-     </thead>
-     <tbody id="tbody-fire"></tbody>
-    </table>
-   </div>
+  <div class="error-message" id="error-311">Error loading data. Please try again later.</div>
+  <div class="data-container" id="data-311">
+  <table>
+   <thead>
+   <tr>
+    <th>Created Date</th>
+    <th>Status ID</th>
+    <th>Area</th>
+    <th>Sub Area</th>
+    <th>FAQ Question</th>
+    <th>City</th>
+    <th>State</th>
+    <th>Zip Code</th>
+   </tr>
+   </thead>
+   <tbody id="tbody-311"></tbody>
+  </table>
   </div>
+ </div>
+  
+ <div class="disclaimer">
+  ** Does not include bulk trash requests, scrap metal requests, and 22-gallon bin deliveries.
+ </div>
 
-  <!-- Police Dispatches Section -->
-  <div class="section">
-   <div class="section-header">Police Dispatches (20895)</div>
-   <div class="loading-message" id="loading-police">Loading police dispatch data, please be patient...</div>
-   <div class="error-message" id="error-police">Error loading data. Please try again later.</div>
-   <div class="data-container" id="data-police">
-    <table>
-     <thead>
-      <tr>
-       <th>Start Time</th>
-       <th>Disposition Description</th>
-       <th>Address</th>
-       <th>City</th>
-       <th>State</th>
-       <th>Zip</th>
-       <th>Place</th>
-      </tr>
-     </thead>
-     <tbody id="tbody-police"></tbody>
-    </table>
-   </div>
+ <!-- Fire Station Responses Section -->
+ <div class="section">
+  <div class="section-header">Fire Station Responses (Kensington)</div>
+  <div class="loading-message" id="loading-fire">
+   <div class="spinner"></div>
+   Loading fire station response data, please be patient...
   </div>
-
-  <!-- Crime Section -->
-  <div class="section">
-   <div class="section-header">Crime (20895)</div>
-   <div class="loading-message" id="loading-crime">Loading crime data, please be patient...</div>
-   <div class="error-message" id="error-crime">Error loading data. Please try again later.</div>
-   <div class="data-container" id="data-crime">
-    <table>
-     <thead>
-      <tr>
-       <th>Start Date</th>
-       <th>Victims</th>
-       <th>Crime Name 1</th>
-       <th>Crime Name 2</th>
-       <th>Crime Name 3</th>
-       <th>Location</th>
-       <th>City</th>
-       <th>State</th>
-       <th>Zip Code</th>
-      </tr>
-     </thead>
-     <tbody id="tbody-crime"></tbody>
-    </table>
-   </div>
-  </div>
-
-  <!-- Daily Arrests Section -->
-  <div class="section">
-   <div class="section-header">Daily Arrests (Kensington)</div>
-   <div class="loading-message" id="loading-arrests">Loading arrest data, please be patient...</div>
-   <div class="error-message" id="error-arrests">Error loading data. Please try again later.</div>
-   <div class="data-container" id="data-arrests">
-    <table>
-     <thead>
-      <tr>
-       <th>Last Name</th>
-       <th>First Name</th>
-       <th>Age</th>
-       <th>Street</th>
-       <th>City</th>
-       <th>Arrest Date</th>
-       <th>Offense</th>
-      </tr>
-     </thead>
-     <tbody id="tbody-arrests"></tbody>
-    </table>
-   </div>
-  </div>
-
-  <!-- Housing Code Violations Section -->
-  <div class="section">
-   <div class="section-header">Housing Code Violations (Kensington)</div>
-   <div class="loading-message" id="loading-housing">Loading housing code violation data, please be patient...</div>
-   <div class="error-message" id="error-housing">Error loading data. Please try again later.</div>
-   <div class="data-container" id="data-housing">
-    <table>
-     <thead>
-      <tr>
-       <th>Date Filed</th>
-       <th>Disposition</th>
-       <th>Street Address</th>
-       <th>Unit Number</th>
-       <th>City</th>
-       <th>Zip Code</th>
-       <th>Location Description</th>
-       <th>Action</th>
-       <th>Code Reference</th>
-       <th>Condition</th>
-       <th>Item</th>
-      </tr>
-     </thead>
-     <tbody id="tbody-housing"></tbody>
-    </table>
-   </div>
-  </div>
-
-  <!-- Food Inspection Fails Section -->
-  <div class="section">
-   <div class="section-header">Food Inspection Fails (County-Wide)</div>
-   <div class="loading-message" id="loading-food">Loading food inspection data, please be patient...</div>
-   <div class="error-message" id="error-food">Error loading data. Please try again later.</div>
-   <div class="data-container" id="data-food">
-    <table>
-     <thead>
-      <tr>
-       <th>Business Name</th>
-       <th>Address</th>
-       <th>City</th>
-       <th>State</th>
-       <th>Zip</th>
-       <th>Inspection Start Date</th>
-       <th>Status</th>
-      </tr>
-     </thead>
-     <tbody id="tbody-food"></tbody>
-    </table>
-   </div>
-  </div>
-
-  <!-- Adoptable Pets Section -->
-  <div class="section">
-   <div class="section-header">Adoptable Pets (County-wide)</div>
-   <div class="loading-message" id="loading-pets">Loading adoptable pets data, please be patient...</div>
-   <div class="error-message" id="error-pets">Error loading data. Please try again later.</div>
-   <div class="data-container" id="data-pets">
-    <table>
-     <thead>
-      <tr>
-       <th>Intake Type</th>
-       <th>Intake Date</th>
-       <th>Pet Name</th>
-       <th>Animal Type</th>
-       <th>Pet Age</th>
-       <th>Pet Size</th>
-       <th>Color</th>
-       <th>Breed</th>
-       <th>Sex</th>
-       <th>URL</th>
-      </tr>
-     </thead>
-     <tbody id="tbody-pets"></tbody>
-    </table>
-   </div>
+  <div class="error-message" id="error-fire">Error loading data. Please try again later.</div>
+  <div class="data-container" id="data-fire">
+  <table>
+   <thead>
+   <tr>
+    <th>Fire Station Number</th>
+    <th>Call Type Description</th>
+    <th>Date</th>
+    <th>Time</th>
+   </tr>
+   </thead>
+   <tbody id="tbody-fire"></tbody>
+  </table>
   </div>
  </div>
 
+ <!-- Police Dispatches Section -->
+ <div class="section">
+  <div class="section-header">Police Dispatches (20895)</div>
+  <div class="loading-message" id="loading-police">
+   <div class="spinner"></div>
+   Loading police dispatch data, please be patient...
+  </div>
+  <div class="error-message" id="error-police">Error loading data. Please try again later.</div>
+  <div class="data-container" id="data-police">
+  <table>
+   <thead>
+   <tr>
+    <th>Start Time</th>
+    <th>Disposition Description</th>
+    <th>Address</th>
+    <th>City</th>
+    <th>State</th>
+    <th>Zip</th>
+    <th>Place</th>
+   </tr>
+   </thead>
+   <tbody id="tbody-police"></tbody>
+  </table>
+  </div>
+ </div>
+
+ <!-- Crime Section -->
+ <div class="section">
+  <div class="section-header">Crime (20895)</div>
+  <div class="loading-message" id="loading-crime">
+   <div class="spinner"></div>
+   Loading crime data, please be patient...
+  </div>
+  <div class="error-message" id="error-crime">Error loading data. Please try again later.</div>
+  <div class="data-container" id="data-crime">
+  <table>
+   <thead>
+   <tr>
+    <th>Start Date</th>
+    <th>Victims</th>
+    <th>Crime Name 1</th>
+    <th>Crime Name 2</th>
+    <th>Crime Name 3</th>
+    <th>Location</th>
+    <th>City</th>
+    <th>State</th>
+    <th>Zip Code</th>
+   </tr>
+   </thead>
+   <tbody id="tbody-crime"></tbody>
+  </table>
+  </div>
+ </div>
+
+ <!-- Daily Arrests Section -->
+ <div class="section">
+  <div class="section-header">Daily Arrests (Kensington)</div>
+  <div class="loading-message" id="loading-arrests">
+   <div class="spinner"></div>
+   Loading arrest data, please be patient...
+  </div>
+  <div class="error-message" id="error-arrests">Error loading data. Please try again later.</div>
+  <div class="data-container" id="data-arrests">
+  <table>
+   <thead>
+   <tr>
+    <th>Last Name</th>
+    <th>First Name</th>
+    <th>Age</th>
+    <th>Street</th>
+    <th>City</th>
+    <th>Arrest Date</th>
+    <th>Offense</th>
+   </tr>
+   </thead>
+   <tbody id="tbody-arrests"></tbody>
+  </table>
+  </div>
+ </div>
+
+ <!-- Housing Code Violations Section -->
+ <div class="section">
+  <div class="section-header">Housing Code Violations (Kensington)</div>
+  <div class="loading-message" id="loading-housing">
+   <div class="spinner"></div>
+   Loading housing code violation data, please be patient...
+  </div>
+  <div class="error-message" id="error-housing">Error loading data. Please try again later.</div>
+  <div class="data-container" id="data-housing">
+  <table>
+   <thead>
+   <tr>
+    <th>Date Filed</th>
+    <th>Disposition</th>
+    <th>Street Address</th>
+    <th>Unit Number</th>
+    <th>City</th>
+    <th>Zip Code</th>
+    <th>Location Description</th>
+    <th>Action</th>
+    <th>Code Reference</th>
+    <th>Condition</th>
+    <th>Item</th>
+   </tr>
+   </thead>
+   <tbody id="tbody-housing"></tbody>
+  </table>
+  </div>
+ </div>
+
+ <!-- Food Inspection Fails Section -->
+ <div class="section">
+  <div class="section-header">Food Inspection Fails (County-Wide)</div>
+  <div class="loading-message" id="loading-food">
+   <div class="spinner"></div>
+   Loading food inspection data, please be patient...
+  </div>
+  <div class="error-message" id="error-food">Error loading data. Please try again later.</div>
+  <div class="data-container" id="data-food">
+  <table>
+   <thead>
+   <tr>
+    <th>Business Name</th>
+    <th>Address</th>
+    <th>City</th>
+    <th>State</th>
+    <th>Zip</th>
+    <th>Inspection Start Date</th>
+    <th>Status</th>
+   </tr>
+   </thead>
+   <tbody id="tbody-food"></tbody>
+  </table>
+  </div>
+ </div>
+
+ <!-- Adoptable Pets Section -->
+ <div class="section">
+  <div class="section-header">Adoptable Pets (County-wide)</div>
+  <div class="loading-message" id="loading-pets">
+   <div class="spinner"></div>
+   Loading adoptable pets data, please be patient...
+  </div>
+  <div class="error-message" id="error-pets">Error loading data. Please try again later.</div>
+  <div class="data-container" id="data-pets">
+  <table>
+   <thead>
+   <tr>
+    <th>Intake Type</th>
+    <th>Intake Date</th>
+    <th>Pet Name</th>
+    <th>Animal Type</th>
+    <th>Pet Age</th>
+    <th>Pet Size</th>
+    <th>Color</th>
+    <th>Breed</th>
+    <th>Sex</th>
+    <th>URL</th>
+   </tr>
+   </thead>
+   <tbody id="tbody-pets"></tbody>
+  </table>
+  </div>
+ </div>
+ </div>
+
  <script>
-  // API configurations with corrected URLs and sorting
-  const apiConfigs = [
-   {
-    id: '311',
-    url: 'https://data.montgomerycountymd.gov/resource/xtyh-brr2.json?x_zipcode=20895&$order=created DESC&$limit=1000',
-    columns: ['created', 'sr_stat_id', 'sr_area', 'sr_sub_area', 'faq_ques_text', 'x_city', 'x_state', 'x_zipcode']
-   },
-   {
-    id: 'fire',
-    url: 'https://data.montgomerycountymd.gov/resource/v68m-9rt9.json?fire_station_number=05&$order=date DESC&$limit=1000',
-    columns: ['fire_station_number', 'call_type_description', 'date', 'time']
-   },
-   {
-    id: 'police',
-    url: 'https://data.montgomerycountymd.gov/resource/98cc-bc7d.json?zip=20895&$order=start_time DESC&$limit=1000',
-    columns: ['start_time', 'disposition_desc', 'address', 'city', 'state', 'zip', 'place']
-   },
-   {
-    id: 'crime',
-    url: 'https://data.montgomerycountymd.gov/resource/icn6-v9z3.json?zip_code=20895&$order=start_date DESC&$limit=1000',
-    columns: ['start_date', 'victims', 'crimename1', 'crimename2', 'crimename3', 'location', 'city', 'state', 'zip_code']
-   },
-   {
-    id: 'arrests',
-    url: 'https://data.montgomerycountymd.gov/resource/xhwt-7h2h.json?$where=upper(city) = \'KENSINGTON\'&$order=arrest_date DESC&$limit=1000',
-    columns: ['last_name', 'first_name', 'age', 'street', 'city', 'arrest_date', 'offense']
-   },
-   {
-    id: 'housing',
-    url: 'https://data.montgomerycountymd.gov/resource/usij-rq8e.json?zip_code=20895&$order=date_filed DESC&$limit=1000',
-    columns: ['date_filed', 'disposition', 'street_address', 'unit_number', 'city', 'zip_code', 'location_description', 'action', 'code_reference', 'condition', 'item']
-   },
-   {
-    id: 'food',
-    url: 'https://data.montgomerycountymd.gov/resource/dkrp-gr48.json?$where=upper(status) = \'FAIL\'&$order=inspection_start_date DESC&$limit=1000',
-    columns: ['business_name', 'address', 'city', 'state', 'zip', 'inspection_start_date', 'status']
-   },
-   {
-    id: 'pets',
-    url: 'https://data.montgomerycountymd.gov/resource/e54u-qx42.json?$order=indate DESC&$limit=1000',
-    columns: ['intype', 'indate', 'petname', 'animaltype', 'petage', 'petsize', 'color', 'breed', 'sex', 'url']
-   }
-  ];
-
-  // Function to extract URL from object or return string
-  function extractUrl(urlValue) {
-   if (!urlValue) return '';
-    
-   // If it's already a string, return it
-   if (typeof urlValue === 'string') {
-    return urlValue;
-   }
-    
-   // If it's an object, try to extract the URL
-   if (typeof urlValue === 'object') {
-    // Common properties that might contain the URL
-    return urlValue.url || urlValue.href || urlValue.link || JSON.stringify(urlValue);
-   }
-    
-   return String(urlValue);
+ // API configurations with corrected URLs and sorting
+ const apiConfigs = [
+  {
+  id: '311',
+  url: 'https://data.montgomerycountymd.gov/resource/xtyh-brr2.json?x_zipcode=20895&$order=created DESC&$limit=1000',
+  columns: ['created', 'sr_stat_id', 'sr_area', 'sr_sub_area', 'faq_ques_text', 'x_city', 'x_state', 'x_zipcode']
+  },
+  {
+  id: 'fire',
+  url: 'https://data.montgomerycountymd.gov/resource/v68m-9rt9.json?fire_station_number=05&$order=date DESC&$limit=1000',
+  columns: ['fire_station_number', 'call_type_description', 'date', 'time']
+  },
+  {
+  id: 'police',
+  url: 'https://data.montgomerycountymd.gov/resource/98cc-bc7d.json?zip=20895&$order=start_time DESC&$limit=1000',
+  columns: ['start_time', 'disposition_desc', 'address', 'city', 'state', 'zip', 'place']
+  },
+  {
+  id: 'crime',
+  url: 'https://data.montgomerycountymd.gov/resource/icn6-v9z3.json?zip_code=20895&$order=start_date DESC&$limit=1000',
+  columns: ['start_date', 'victims', 'crimename1', 'crimename2', 'crimename3', 'location', 'city', 'state', 'zip_code']
+  },
+  {
+  id: 'arrests',
+  url: 'https://data.montgomerycountymd.gov/resource/xhwt-7h2h.json?$where=upper(city) = \'KENSINGTON\'&$order=arrest_date DESC&$limit=1000',
+  columns: ['last_name', 'first_name', 'age', 'street', 'city', 'arrest_date', 'offense']
+  },
+  {
+  id: 'housing',
+  url: 'https://data.montgomerycountymd.gov/resource/usij-rq8e.json?zip_code=20895&$order=date_filed DESC&$limit=1000',
+  columns: ['date_filed', 'disposition', 'street_address', 'unit_number', 'city', 'zip_code', 'location_description', 'action', 'code_reference', 'condition', 'item']
+  },
+  {
+  id: 'food',
+  url: 'https://data.montgomerycountymd.gov/resource/dkrp-gr48.json?$where=upper(status) = \'FAIL\'&$order=inspection_start_date DESC&$limit=1000',
+  columns: ['business_name', 'address', 'city', 'state', 'zip', 'inspection_start_date', 'status']
+  },
+  {
+  id: 'pets',
+  url: 'https://data.montgomerycountymd.gov/resource/e54u-qx42.json?$order=indate DESC&$limit=1000',
+  columns: ['intype', 'indate', 'petname', 'animaltype', 'petage', 'petsize', 'color', 'breed', 'sex', 'url']
   }
+ ];
 
-  // Function to format location coordinates
-  function formatLocation(locationValue) {
-   if (!locationValue) return '';
-    
-   // If it's already a string, return it
-   if (typeof locationValue === 'string') {
-    return locationValue;
-   }
-    
-   // If it's an object with coordinates, format it nicely
-   if (typeof locationValue === 'object' && locationValue.coordinates) {
-    const coords = locationValue.coordinates;
-    if (Array.isArray(coords) && coords.length >= 2) {
-     return `${coords[1]}, ${coords[0]}`; // lat, lng format
-    }
-   }
-    
-   // Fallback to JSON string
-   return JSON.stringify(locationValue);
+ // Function to extract URL from object or return string
+ function extractUrl(urlValue) {
+  if (!urlValue) return '';
+   
+  // If it's already a string, return it
+  if (typeof urlValue === 'string') {
+  return urlValue;
   }
-
-  // Function to load data for each API
-  async function loadData(config) {
-   try {
-    console.log(`Loading ${config.id} from: ${config.url}`);
-    const response = await fetch(config.url);
-     
-    if (!response.ok) {
-     throw new Error(`HTTP error! status: ${response.status}`);
-    }
-     
-    const data = await response.json();
-    console.log(`${config.id} data:`, data);
-     
-    // Hide loading message
-    document.getElementById(`loading-${config.id}`).style.display = 'none';
-     
-    if (data.length === 0) {
-     document.getElementById(`error-${config.id}`).textContent = 'No data available for this dataset.';
-     document.getElementById(`error-${config.id}`).style.display = 'block';
-     return;
-    }
-     
-    // Show data container
-    document.getElementById(`data-${config.id}`).style.display = 'block';
-     
-    // Filter out bulk trash requests, bin requests, and scrap metal requests for 311 data
-    let filteredData = data;
-    if (config.id === '311') {
-     filteredData = data.filter(item => 
-      !item.sr_sub_area || 
-      (item.sr_sub_area.toLowerCase() !== 'bulk trash request' &&
-       item.sr_sub_area.toLowerCase() !== 'bin request-new' &&
-       item.sr_sub_area.toLowerCase() !== 'scrap metal request')
-     );
-    }
-     
-    // Populate table
-    const tbody = document.getElementById(`tbody-${config.id}`);
-    filteredData.slice(0, 1000).forEach(item => {
-     const row = document.createElement('tr');
-     config.columns.forEach(column => {
-      const cell = document.createElement('td');
-      let value = item[column] || '';
-       
-      // Format dates for better readability
-      if (column.includes('date') || column.includes('time')) {
-       if (value && value.includes && value.includes('T')) {
-        value = new Date(value).toLocaleString();
-       }
-      }
-       
-      // Handle URLs properly
-      if (column === 'url' && config.id === 'pets') {
-       const urlString = extractUrl(value);
-       if (urlString && urlString !== '{}' && !urlString.startsWith('{')) {
-        const link = document.createElement('a');
-        link.href = urlString.startsWith('http') ? urlString : 'https://' + urlString;
-        link.textContent = 'View';
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        cell.appendChild(link);
-       } else {
-        cell.textContent = 'No URL';
-       }
-      }
-      // Handle location coordinates for fire station data
-      else if (column === 'location' && config.id === 'fire') {
-       cell.textContent = formatLocation(value);
-      }
-      // Handle other object values
-      else {
-       if (typeof value === 'object' && value !== null) {
-        cell.textContent = JSON.stringify(value);
-       } else {
-        cell.textContent = value;
-       }
-      }
-       
-      row.appendChild(cell);
-     });
-     tbody.appendChild(row);
-    });
-     
-   } catch (error) {
-    console.error(`Error loading ${config.id}:`, error);
-    document.getElementById(`loading-${config.id}`).style.display = 'none';
-    document.getElementById(`error-${config.id}`).textContent = `Error loading data: ${error.message}`;
-    document.getElementById(`error-${config.id}`).style.display = 'block';
-   }
+   
+  // If it's an object, try to extract the URL
+  if (typeof urlValue === 'object') {
+  // Common properties that might contain the URL
+  return urlValue.url || urlValue.href || urlValue.link || JSON.stringify(urlValue);
   }
+   
+  return String(urlValue);
+ }
 
-  // Load all data when page loads
-  window.addEventListener('DOMContentLoaded', () => {
-   apiConfigs.forEach(config => {
-    loadData(config);
+ // Function to format location coordinates
+ function formatLocation(locationValue) {
+  if (!locationValue) return '';
+   
+  // If it's already a string, return it
+  if (typeof locationValue === 'string') {
+  return locationValue;
+  }
+   
+  // If it's an object with coordinates, format it nicely
+  if (typeof locationValue === 'object' && locationValue.coordinates) {
+  const coords = locationValue.coordinates;
+  if (Array.isArray(coords) && coords.length >= 2) {
+   return `${coords[1]}, ${coords[0]}`; // lat, lng format
+  }
+  }
+   
+  // Fallback to JSON string
+  return JSON.stringify(locationValue);
+ }
+
+ // Function to load data for each API
+ async function loadData(config) {
+  try {
+  console.log(`Loading ${config.id} from: ${config.url}`);
+  const response = await fetch(config.url);
+   
+  if (!response.ok) {
+   throw new Error(`HTTP error! status: ${response.status}`);
+  }
+   
+  const data = await response.json();
+  console.log(`${config.id} data:`, data);
+   
+  // Hide loading message
+  document.getElementById(`loading-${config.id}`).style.display = 'none';
+   
+  if (data.length === 0) {
+   document.getElementById(`error-${config.id}`).textContent = 'No data available for this dataset.';
+   document.getElementById(`error-${config.id}`).style.display = 'block';
+   return;
+  }
+   
+  // Show data container
+  document.getElementById(`data-${config.id}`).style.display = 'block';
+   
+  // Filter out bulk trash requests, bin requests, and scrap metal requests for 311 data
+  let filteredData = data;
+  if (config.id === '311') {
+   filteredData = data.filter(item => 
+   !item.sr_sub_area || 
+   (item.sr_sub_area.toLowerCase() !== 'bulk trash request' &&
+    item.sr_sub_area.toLowerCase() !== 'bin request-new' &&
+    item.sr_sub_area.toLowerCase() !== 'scrap metal request')
+   );
+  }
+   
+  // Populate table
+  const tbody = document.getElementById(`tbody-${config.id}`);
+  filteredData.slice(0, 1000).forEach(item => {
+   const row = document.createElement('tr');
+   config.columns.forEach(column => {
+   const cell = document.createElement('td');
+   let value = item[column] || '';
+    
+   // Format dates for better readability
+   if (column.includes('date') || column.includes('time')) {
+    if (value && value.includes && value.includes('T')) {
+    value = new Date(value).toLocaleString();
+    }
+   }
+    
+   // Handle URLs properly
+   if (column === 'url' && config.id === 'pets') {
+    const urlString = extractUrl(value);
+    if (urlString && urlString !== '{}' && !urlString.startsWith('{')) {
+    const link = document.createElement('a');
+    link.href = urlString.startsWith('http') ? urlString : 'https://' + urlString;
+    link.textContent = 'View';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    cell.appendChild(link);
+    } else {
+    cell.textContent = 'No URL';
+    }
+   }
+   // Handle location coordinates for fire station data
+   else if (column === 'location' && config.id === 'fire') {
+    cell.textContent = formatLocation(value);
+   }
+   // Handle other object values
+   else {
+    if (typeof value === 'object' && value !== null) {
+    cell.textContent = JSON.stringify(value);
+    } else {
+    cell.textContent = value;
+    }
+   }
+    
+   row.appendChild(cell);
    });
+   tbody.appendChild(row);
   });
+   
+  } catch (error) {
+  console.error(`Error loading ${config.id}:`, error);
+  document.getElementById(`loading-${config.id}`).style.display = 'none';
+  document.getElementById(`error-${config.id}`).textContent = `Error loading data: ${error.message}`;
+  document.getElementById(`error-${config.id}`).style.display = 'block';
+  }
+ }
+
+ // Load all data when page loads
+ window.addEventListener('DOMContentLoaded', () => {
+  apiConfigs.forEach(config => {
+  loadData(config);
+  });
+ });
  </script>
 </body>
 </html>
