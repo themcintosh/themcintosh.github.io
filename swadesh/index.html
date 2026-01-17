@@ -307,10 +307,34 @@
             // Generate new random seed
             currentSeed = Math.floor(Math.random() * 1000000);
 
-            // Select one random word from each list using the seed
-            const word1 = wordLists.list1[Math.floor(seededRandom(currentSeed) * wordLists.list1.length)];
-            const word2 = wordLists.list2[Math.floor(seededRandom(currentSeed + 1) * wordLists.list2.length)];
-            const word3 = wordLists.list3[Math.floor(seededRandom(currentSeed + 2) * wordLists.list3.length)];
+            // Select unique words from each list
+            const selectedWords = [];
+            let seedOffset = 0;
+
+            // Select from list1
+            let word1 = wordLists.list1[Math.floor(seededRandom(currentSeed + seedOffset) * wordLists.list1.length)];
+            selectedWords.push(word1);
+            seedOffset++;
+
+            // Select from list2, ensure it's different from word1
+            let word2;
+            let attempts = 0;
+            do {
+                word2 = wordLists.list2[Math.floor(seededRandom(currentSeed + seedOffset) * wordLists.list2.length)];
+                seedOffset++;
+                attempts++;
+            } while (selectedWords.includes(word2) && attempts < 100);
+            selectedWords.push(word2);
+
+            // Select from list3, ensure it's different from word1 and word2
+            let word3;
+            attempts = 0;
+            do {
+                word3 = wordLists.list3[Math.floor(seededRandom(currentSeed + seedOffset) * wordLists.list3.length)];
+                seedOffset++;
+                attempts++;
+            } while (selectedWords.includes(word3) && attempts < 100);
+            selectedWords.push(word3);
 
             currentWords = [word1, word2, word3];
 
