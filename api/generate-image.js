@@ -42,8 +42,12 @@ export default async function handler(req, res) {
         if (!openaiResponse.ok) {
             const errorData = await openaiResponse.json();
             console.error('OpenAI API error:', errorData);
+            console.error('Prompt that caused error:', prompt);
+            console.error('Words:', words);
             return res.status(openaiResponse.status).json({
-                error: errorData.error?.message || 'Failed to generate image from OpenAI'
+                error: errorData.error?.message || 'Failed to generate image from OpenAI',
+                details: errorData.error || {},
+                prompt: prompt
             });
         }
 

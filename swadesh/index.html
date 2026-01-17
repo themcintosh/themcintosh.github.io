@@ -365,7 +365,7 @@
             }
 
             // Create prompt from words
-            const prompt = `An image depicting ${currentWords.join(', ')}, without any text or words in the image`;
+            const prompt = `${currentWords.join(', ')}`;
 
             // Disable buttons
             document.getElementById('shuffleBtn').disabled = true;
@@ -391,6 +391,7 @@
 
                 if (!response.ok) {
                     const errorData = await response.json();
+                    console.error('Full error response:', errorData);
                     throw new Error(errorData.error || 'Failed to generate image');
                 }
 
@@ -406,8 +407,10 @@
 
             } catch (error) {
                 console.error('Error generating image:', error);
+                console.error('Current words:', currentWords);
+                console.error('Prompt used:', prompt);
                 document.getElementById('loadingContainer').classList.remove('active');
-                showError(`Error: ${error.message}`);
+                showError(`Error: ${error.message}. Words: ${currentWords.join(', ')}`);
             } finally {
                 // Re-enable buttons
                 document.getElementById('shuffleBtn').disabled = false;
