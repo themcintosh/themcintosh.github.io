@@ -364,8 +364,8 @@
                 return;
             }
 
-            // Create prompt from words
-            const prompt = `${currentWords.join(', ')}`;
+            // Create prompt from words - DALL-E needs a descriptive sentence, not just keywords
+            const prompt = `A creative artistic image showing the concepts: ${currentWords.join(', ')}`;
 
             // Disable buttons
             document.getElementById('shuffleBtn').disabled = true;
