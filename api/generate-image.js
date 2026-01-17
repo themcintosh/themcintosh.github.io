@@ -22,6 +22,20 @@ export default async function handler(req, res) {
         console.log('Generating image for prompt:', prompt);
         console.log('Words:', words);
 
+        // Prepare the request body
+        const requestBody = {
+            model: 'dall-e-3',
+            prompt: prompt,
+            n: 1,
+            size: '1024x1024',
+            quality: 'standard',
+            style: 'vivid'
+        };
+
+        console.log('Request body:', JSON.stringify(requestBody, null, 2));
+        console.log('API Key present:', !!openaiApiKey);
+        console.log('API Key length:', openaiApiKey ? openaiApiKey.length : 0);
+
         // Call OpenAI API using DALL-E
         const openaiResponse = await fetch('https://api.openai.com/v1/images/generations', {
             method: 'POST',
@@ -29,21 +43,31 @@ export default async function handler(req, res) {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${openaiApiKey}`
             },
-            body: JSON.stringify({
-                model: 'dall-e-3',  // Using DALL-E 3 for better quality
-                prompt: prompt,
-                n: 1,  // Generate 1 image
-                size: '1024x1024',  // Standard size
-                quality: 'standard',  // Can be 'hd' for higher quality
-                style: 'vivid'  // 'vivid' for more creative, 'natural' for more realistic
-            })
+            body: JSON.stringify(requestBody)
         });
 
+        console.log('OpenAI Response status:', openaiResponse.status);
+        console.log('OpenAI Response headers:', Object.fromEntries(openaiResponse.headers.entries()));
+
         if (!openaiResponse.ok) {
-            const errorData = await openaiResponse.json();
-            console.error('OpenAI API error:', errorData);
+            const errorText = await openaiResponse.text();
+            console.error('OpenAI API error status:', openaiResponse.status);
+            console.error('OpenAI API error body:', errorText);
+            console.error('Prompt that caused error:', prompt);
+            console.error('Words:', words);
+
+            let errorData;
+            try {
+                errorData = JSON.parse(errorText);
+            } catch (e) {
+                errorData = { message: errorText };
+            }
+
             return res.status(openaiResponse.status).json({
-                error: errorData.error?.message || 'Failed to generate image from OpenAI'
+                error: errorData.error?.message || errorData.message || 'Failed to generate image from OpenAI',
+                details: errorData,
+                prompt: prompt,
+                status: openaiResponse.status
             });
         }
 
