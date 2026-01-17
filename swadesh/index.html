@@ -215,23 +215,85 @@
         <div id="errorMessage" class="error-message"></div>
     </div>
 
-    <script>
-        // Three word lists for Swadesh-style combinations
-        const wordLists = {
-            list1: [
-                'sun', 'moon', 'star', 'cloud', 'rain', 'snow', 'wind', 'fire', 'water', 'earth',
-                'mountain', 'river', 'ocean', 'forest', 'desert', 'island', 'valley', 'lake', 'storm', 'rainbow'
-            ],
-            list2: [
-                'bird', 'fish', 'dog', 'cat', 'horse', 'bear', 'wolf', 'eagle', 'lion', 'tiger',
-                'elephant', 'whale', 'butterfly', 'snake', 'fox', 'deer', 'rabbit', 'owl', 'dragon', 'phoenix'
-            ],
-            list3: [
-                'dancing', 'flying', 'swimming', 'sleeping', 'eating', 'singing', 'running', 'jumping', 'playing', 'dreaming',
-                'laughing', 'crying', 'fighting', 'loving', 'creating', 'exploring', 'meditating', 'celebrating', 'wondering', 'transforming'
-            ]
-        };
-
+<script>
+    // Three word lists for Swadesh-style combinations
+    const wordLists = {
+        list1: [
+            'I', 'you', 'they', 'we',
+            'this', 'that', 'here', 'there', 'who', 'what', 'where', 'when', 'how', 'not',
+            'all', 'many', 'some', 'few', 'other', 'one', 'two', 'three', 'four', 'five',
+            'big', 'long', 'wide', 'thick', 'heavy', 'small', 'short', 'narrow', 'thin',
+            'woman', 'man', 'human being', 'child', 'wife', 'husband',
+            'mother', 'father', 'animal', 'fish', 'bird', 'dog', 'louse', 'snake', 'worm',
+            'tree', 'forest', 'stick', 'fruit', 'seed', 'leaf', 'root', 'tree bark',
+            'flower', 'grass', 'rope', 'skin', 'meat', 'blood', 'bone', 'fat', 'egg',
+            'horn', 'tail', 'feather', 'hair', 'head', 'ear', 'eye', 'nose', 'mouth', 'tooth',
+            'tongue', 'fingernail', 'foot', 'leg', 'knee', 'hand', 'wing', 'belly',
+            'guts', 'neck', 'back', 'breast', 'heart', 'liver', 'drink', 'eat', 'bite', 'suck',
+            'spit', 'vomit', 'blow', 'breathe', 'laugh', 'see', 'hear', 'know', 'think',
+            'smell', 'fear', 'sleep', 'live', 'die', 'kill', 'fight', 'hunt', 'hit', 'cut',
+            'split', 'stab', 'scratch', 'dig', 'swim', 'fly', 'walk', 'come', 'lie',
+            'sit', 'stand', 'turn', 'fall', 'give', 'hold', 'squeeze', 'rub',
+            'wash', 'wipe', 'pull', 'push', 'throw', 'tie', 'sew', 'count', 'say', 'sing',
+            'play', 'float', 'flow', 'freeze', 'swell', 'sun', 'moon', 'star', 'water', 'rain',
+            'river', 'lake', 'sea', 'salt', 'stone', 'sand', 'dust', 'earth', 'cloud', 'fog',
+            'sky', 'wind', 'snow', 'ice', 'smoke', 'fire', 'ash', 'burn', 'road', 'mountain',
+            'red', 'green', 'yellow', 'white', 'black', 'night', 'day', 'year', 'warm', 'cold',
+            'full', 'new', 'old', 'good', 'bad', 'rotten', 'dirty', 'straight', 'round',
+            'sharp', 'dull', 'smooth', 'wet', 'dry', 'correct',
+            'near', 'far', 'right', 'left', 'at', 'in', 'with', 'and', 'if', 'because', 'name'
+        ],
+        list2: [
+            'I', 'you', 'they', 'we',
+            'this', 'that', 'here', 'there', 'who', 'what', 'where', 'when', 'how', 'not',
+            'all', 'many', 'some', 'few', 'other', 'one', 'two', 'three', 'four', 'five',
+            'big', 'long', 'wide', 'thick', 'heavy', 'small', 'short', 'narrow', 'thin',
+            'woman', 'man', 'human being', 'child', 'wife', 'husband',
+            'mother', 'father', 'animal', 'fish', 'bird', 'dog', 'louse', 'snake', 'worm',
+            'tree', 'forest', 'stick', 'fruit', 'seed', 'leaf', 'root', 'tree bark',
+            'flower', 'grass', 'rope', 'skin', 'meat', 'blood', 'bone', 'fat', 'egg',
+            'horn', 'tail', 'feather', 'hair', 'head', 'ear', 'eye', 'nose', 'mouth', 'tooth',
+            'tongue', 'fingernail', 'foot', 'leg', 'knee', 'hand', 'wing', 'belly',
+            'guts', 'neck', 'back', 'breast', 'heart', 'liver', 'drink', 'eat', 'bite', 'suck',
+            'spit', 'vomit', 'blow', 'breathe', 'laugh', 'see', 'hear', 'know', 'think',
+            'smell', 'fear', 'sleep', 'live', 'die', 'kill', 'fight', 'hunt', 'hit', 'cut',
+            'split', 'stab', 'scratch', 'dig', 'swim', 'fly', 'walk', 'come', 'lie',
+            'sit', 'stand', 'turn', 'fall', 'give', 'hold', 'squeeze', 'rub',
+            'wash', 'wipe', 'pull', 'push', 'throw', 'tie', 'sew', 'count', 'say', 'sing',
+            'play', 'float', 'flow', 'freeze', 'swell', 'sun', 'moon', 'star', 'water', 'rain',
+            'river', 'lake', 'sea', 'salt', 'stone', 'sand', 'dust', 'earth', 'cloud', 'fog',
+            'sky', 'wind', 'snow', 'ice', 'smoke', 'fire', 'ash', 'burn', 'road', 'mountain',
+            'red', 'green', 'yellow', 'white', 'black', 'night', 'day', 'year', 'warm', 'cold',
+            'full', 'new', 'old', 'good', 'bad', 'rotten', 'dirty', 'straight', 'round',
+            'sharp', 'dull', 'smooth', 'wet', 'dry', 'correct',
+            'near', 'far', 'right', 'left', 'at', 'in', 'with', 'and', 'if', 'because', 'name'
+        ],
+        list3: [
+            'I', 'you', 'they', 'we',
+            'this', 'that', 'here', 'there', 'who', 'what', 'where', 'when', 'how', 'not',
+            'all', 'many', 'some', 'few', 'other', 'one', 'two', 'three', 'four', 'five',
+            'big', 'long', 'wide', 'thick', 'heavy', 'small', 'short', 'narrow', 'thin',
+            'woman', 'man', 'human being', 'child', 'wife', 'husband',
+            'mother', 'father', 'animal', 'fish', 'bird', 'dog', 'louse', 'snake', 'worm',
+            'tree', 'forest', 'stick', 'fruit', 'seed', 'leaf', 'root', 'tree bark',
+            'flower', 'grass', 'rope', 'skin', 'meat', 'blood', 'bone', 'fat', 'egg',
+            'horn', 'tail', 'feather', 'hair', 'head', 'ear', 'eye', 'nose', 'mouth', 'tooth',
+            'tongue', 'fingernail', 'foot', 'leg', 'knee', 'hand', 'wing', 'belly',
+            'guts', 'neck', 'back', 'breast', 'heart', 'liver', 'drink', 'eat', 'bite', 'suck',
+            'spit', 'vomit', 'blow', 'breathe', 'laugh', 'see', 'hear', 'know', 'think',
+            'smell', 'fear', 'sleep', 'live', 'die', 'kill', 'fight', 'hunt', 'hit', 'cut',
+            'split', 'stab', 'scratch', 'dig', 'swim', 'fly', 'walk', 'come', 'lie',
+            'sit', 'stand', 'turn', 'fall', 'give', 'hold', 'squeeze', 'rub',
+            'wash', 'wipe', 'pull', 'push', 'throw', 'tie', 'sew', 'count', 'say', 'sing',
+            'play', 'float', 'flow', 'freeze', 'swell', 'sun', 'moon', 'star', 'water', 'rain',
+            'river', 'lake', 'sea', 'salt', 'stone', 'sand', 'dust', 'earth', 'cloud', 'fog',
+            'sky', 'wind', 'snow', 'ice', 'smoke', 'fire', 'ash', 'burn', 'road', 'mountain',
+            'red', 'green', 'yellow', 'white', 'black', 'night', 'day', 'year', 'warm', 'cold',
+            'full', 'new', 'old', 'good', 'bad', 'rotten', 'dirty', 'straight', 'round',
+            'sharp', 'dull', 'smooth', 'wet', 'dry', 'correct',
+            'near', 'far', 'right', 'left', 'at', 'in', 'with', 'and', 'if', 'because', 'name'
+        ]
+    };
         let currentWords = [];
         let currentSeed = 0;
 
