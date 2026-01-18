@@ -614,8 +614,8 @@
             const style2 = artStyles[style2Index];
 
             // Create prompt with art styles
-            const prompt = `Make an image without words. The image is called "${currentWords.join(' ')}". The primary objects and focus of the image are rendered in the style of 
-             ${style1}. The accent style or secondary blended style for the image is rendered as ${style2}.`;
+            const prompt = `Make an image entitled "${currentWords.join(' ')}". The primary objects and focus of the image are rendered in the style of 
+             ${style1}. The accent style or secondary blended style for the image is rendered as ${style2}. IMPORTANT: do not include any text or lettering in the image.`;
 
             // Disable buttons
             document.getElementById('shuffleBtn').disabled = true;
