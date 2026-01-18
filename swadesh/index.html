@@ -365,7 +365,7 @@
             }
 
             // Create prompt from words - DALL-E needs a descriptive sentence, not just keywords
-            const prompt = `Make an image without words that blends the ideas: ${currentWords.join(', ')}`;
+            const prompt = `Make an image without words. The image is called ${currentWords.join(', ')}`;
 
             // Disable buttons
             document.getElementById('shuffleBtn').disabled = true;
