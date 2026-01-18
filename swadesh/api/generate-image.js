@@ -28,9 +28,7 @@ export default async function handler(req, res) {
             prompt: prompt,
             n: 1,
             size: '1024x1024',
-            quality: 'standard',
-            style: 'natural'
-        };
+        }
 
         console.log('Request body:', JSON.stringify(requestBody, null, 2));
         console.log('API Key present:', !!openaiApiKey);
