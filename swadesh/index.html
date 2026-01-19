@@ -645,6 +645,9 @@ Validation Requirement
 The final image should be visually explainable as:
 "Primary subjects rendered in ${style1}, supported by a composition and secondary elements organized according to ${style2}."`;
 
+            // Create simplified display prompt for user
+            const displayPrompt = `Make an image entitled "${currentWords.join(' ')}". The primary style is ${style1} and the secondary style is ${style2}.`;
+
             // Disable buttons
             document.getElementById('shuffleBtn').disabled = true;
             document.getElementById('generateBtn').disabled = true;
@@ -680,7 +683,7 @@ The final image should be visually explainable as:
 
                 // Display image
                 document.getElementById('generatedImage').src = data.imageUrl;
-                document.getElementById('imagePrompt').textContent = `Prompt: "${prompt}"`;
+                document.getElementById('imagePrompt').textContent = `Prompt: "${displayPrompt}"`;
                 document.getElementById('imageContainer').classList.add('active');
 
             } catch (error) {
