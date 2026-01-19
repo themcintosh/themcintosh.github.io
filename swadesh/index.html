@@ -598,55 +598,38 @@
                 return;
             }
 
-            // Generate random seeds for style selection
-            const styleSeed1 = Math.floor(Math.random() * 1000000);
-            const styleSeed2 = Math.floor(Math.random() * 1000000);
+            // Generate random seed for style selection
+            const styleSeed = Math.floor(Math.random() * 1000000);
 
-            // Select two random styles
-            const style1Index = Math.floor(seededRandom(styleSeed1) * artStyles.length);
-            let style2Index;
-            // Ensure style2 is different from style1
-            do {
-                style2Index = Math.floor(seededRandom(styleSeed2) * artStyles.length);
-            } while (style2Index === style1Index);
+            // Select random style
+            const styleIndex = Math.floor(seededRandom(styleSeed) * artStyles.length);
+            const style = artStyles[styleIndex];
 
-            const style1 = artStyles[style1Index];
-            const style2 = artStyles[style2Index];
-
-            // Create prompt with art styles
+            // Create prompt with art style
             const prompt = `Make an image entitled "${currentWords.join(' ')}".
 
-Primary Style Assignment
-The main subjects, focal elements, and dominant visual forms must be rendered strictly in the style of ${style1}. This style governs:
+Style Assignment
+The image must be rendered strictly in the style of ${style}. This style governs all aspects of the image including:
 	•	Form and structure
-	•	Proportion and distortion
+	•	Composition and layout
 	•	Visual language and expressiveness
-	•	How the primary subjects occupy space
-
-Secondary (Accent) Style Assignment
-Secondary elements, supporting structures, and compositional organization must be rendered strictly in the style of ${style2}. This style governs:
-	•	Overall composition and layout
 	•	Use of space, balance, and hierarchy
-	•	Visual rhythm and supporting details
-
-Style Hierarchy Rule
-The primary style must dominate perceptually. The secondary style may influence but must not override, reinterpret, or dilute the defining characteristics of the primary style. If a conflict arises, defer to the primary style for subject treatment and the secondary style for structure only.
 
 Style Integrity Constraints
-	•	Do not introduce visual traits from styles other than ${style1} and ${style2}.
-	•	Do not default to photorealism, contemporary illustration, cinematic lighting, or generic AI aesthetics unless explicitly part of the named styles.
-	•	Avoid hybridization beyond the defined primary/secondary roles.
+	•	Do not introduce visual traits from styles other than ${style}.
+	•	Do not default to photorealism, contemporary illustration, cinematic lighting, or generic AI aesthetics unless explicitly part of the named style.
+	•	Maintain consistent adherence to the defining characteristics of ${style}.
 
 Content Constraints
 	•	Do not include any text, lettering, symbols, signage, or readable characters unless explicitly requested.
-	•	Do not include stylistic elements that imply typography or graphic design unless required by the styles themselves.
+	•	Do not include stylistic elements that imply typography or graphic design unless required by the style itself.
 
 Validation Requirement
 The final image should be visually explainable as:
-"Primary subjects rendered in ${style1}, supported by a composition and secondary elements organized according to ${style2}."`;
+"An image rendered in ${style} style depicting ${currentWords.join(' ')}."`;
 
             // Create simplified display prompt for user
-            const displayPrompt = `Make an image entitled "${currentWords.join(' ')}". The primary style is ${style1} and the secondary style is ${style2}. [Word seed: ${currentSeed}, Style 1 seed: ${styleSeed1}, Style 2 seed: ${styleSeed2}]`;
+            const displayPrompt = `Make an image entitled "${currentWords.join(' ')}". The style is ${style}. [Word seed: ${currentSeed}, Style seed: ${styleSeed}]`;
 
             // Disable buttons
             document.getElementById('shuffleBtn').disabled = true;
