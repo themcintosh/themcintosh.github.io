@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Swadesh Word Image Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #34495e;
+        }
+
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        .words-display {
+            background-color: #ecf0f1;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .words-display.empty {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .word-list {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .word-item {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .loading-container {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading-container.active {
+            display: block;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2c3e50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-message {
+            color: #2c3e50;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .patience-message {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .image-container {
+            display: none;
+            text-align: center;
+        }
+
+        .image-container.active {
+            display: block;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .image-prompt {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 4px;
+            color: #2c3e50;
+            font-style: italic;
+        }
+
+        .error-message {
+            display: none;
+            background-color: #e74c3c;
+            color: white;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        .info-box {
+            background-color: #d6eaf8;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Swadesh Word Image Generator</h1>
+        <p class="subtitle">Generate creative AI images from random word combinations</p>
+
+        <div class="info-box">
+            Click "Shuffle Words" to randomly select three words from different categories.
+            If you like the combination, click "Generate Image" to create an AI-generated image
+            based on those words using OpenAI's DALL-E.
+        </div>
+
+        <div class="button-container">
+            <button id="shuffleBtn" onclick="shuffleWords()">Shuffle Words</button>
+            <button id="generateBtn" onclick="generateImage()" disabled>Generate Image</button>
+        </div>
+
+        <div id="wordsDisplay" class="words-display empty">
+            Click "Shuffle Words" to get started
+        </div>
+
+        <div id="loadingContainer" class="loading-container">
+            <div class="spinner"></div>
+            <div class="loading-message">Generating your image...</div>
+            <div class="patience-message">Please be patient, this may take 15-30 seconds</div>
+        </div>
+
+        <div id="imageContainer" class="image-container">
+            <img id="generatedImage" src="" alt="Generated Image">
+            <div id="imagePrompt" class="image-prompt"></div>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+    </div>
+
+<script>
+    // Art styles for random selection
+    const artStyles = [
+        'Cave painting / Prehistoric',
+        'Ancient Egyptian',
+        'Ancient Greek black-figure',
+        'Ancient Greek red-figure',
+        'Roman fresco',
+        'Byzantine iconography',
+        'Medieval illumination',
+        'Romanesque',
+        'Gothic',
+        'Early Renaissance',
+        'High Renaissance',
+        'Mannerism',
+        'Baroque',
+        'Rococo',
+        'Neoclassicism',
+        'Romanticism',
+        'Realism 19th century',
+        'Academic painting',
+        'Impressionism',
+        'Post-Impressionism',
+        'Fauvism',
+        'Expressionism',
+        'Symbolism',
+        'Cubism Analytic',
+        'Cubism Synthetic',
+        'Futurism',
+        'Suprematism',
+        'Constructivism',
+        'De Stijl',
+        'Dada',
+        'Surrealism',
+        'Precisionism',
+        'Social Realism',
+        'Abstract Expressionism',
+        'Color Field painting',
+        'Hard-edge painting',
+        'Op Art',
+        'Minimalism',
+        'Conceptual art',
+        'Pop Art',
+        'Neo-Expressionism',
+        'Postmodern collage',
+        'Contemporary realism',
+        'Hyperrealism',
+        'Photorealism',
+        'Pen and ink',
+        'Etching',
+        'Woodcut',
+        'Linocut',
+        'Lithograph',
+        'Charcoal sketch',
+        'Graphite sketch',
+        'Watercolor illustration',
+        'Gouache',
+        'Pastel illustration',
+        'Oil illustration',
+        'Tempera',
+        'Children\'s book illustration',
+        'Storybook fantasy',
+        'Fairytale illustration',
+        'Vintage magazine illustration',
+        'Scientific illustration',
+        'Botanical illustration',
+        'Medical illustration',
+        'Educational diagram style',
+        'Digital painting',
+        'Concept art',
+        'Matte painting',
+        'Speed painting',
+        'Stylized digital illustration',
+        'Semi-realistic digital art',
+        'Ultra-detailed digital realism',
+        'Painterly digital brush style',
+        'Flat digital illustration',
+        'Vector art',
+        'Gradient-mesh illustration',
+        'Low-poly art',
+        'Isometric art',
+        'Pixel art',
+        '8-bit retro game art',
+        '16-bit retro game art',
+        'Voxel art',
+        'Procedural art',
+        'Generative art',
+        'Classic Disney animation',
+        'Modern Disney-inspired',
+        'Pixar-style 3D animation',
+        'DreamWorks-style animation',
+        'Cartoon Network style',
+        'Adult animation style',
+        'Comic strip style',
+        'Sunday newspaper comics',
+        'Graphic novel style',
+        'Superhero comic Golden Age',
+        'Superhero comic Silver Age',
+        'Superhero comic Modern Age',
+        'Noir comic style',
+        'Anime',
+        'Shōnen anime',
+        'Shōjo anime',
+        'Seinen anime',
+        'Chibi',
+        'Mecha anime',
+        'Cyberpunk anime',
+        '90s anime aesthetic',
+        'Modern anime aesthetic',
+        'Manga black-and-white',
+        'Manhwa style',
+        'Webtoon style',
+        'Art Nouveau',
+        'Art Deco',
+        'Bauhaus',
+        'Swiss International Style',
+        'Mid-century modern',
+        'Memphis design',
+        'Brutalism',
+        'Neo-brutalism',
+        'Minimalist design',
+        'Maximalist design',
+        'Flat design',
+        'Material design',
+        'Skeuomorphic design',
+        'Retro-futurism',
+        'Vaporwave',
+        'Synthwave',
+        'Y2K aesthetic',
+        'Cyber aesthetic',
+        'Corporate illustration style',
+        'Portrait photography',
+        'Studio photography',
+        'Editorial photography',
+        'Fashion photography',
+        'Street photography',
+        'Documentary photography',
+        'Photojournalism',
+        'Architectural photography',
+        'Landscape photography',
+        'Macro photography',
+        'Wildlife photography',
+        'Product photography',
+        'Food photography',
+        'Cinematic still',
+        'Film noir',
+        'Hollywood Golden Age',
+        'Technicolor look',
+        '35mm film look',
+        '16mm film look',
+        'Polaroid look',
+        'Vintage sepia',
+        'High-key lighting',
+        'Low-key lighting',
+        'Moody cinematic lighting',
+        'Shallow depth of field',
+        'HDR look',
+        'Anamorphic lens look',
+        'High fantasy illustration',
+        'Dark fantasy',
+        'Epic fantasy',
+        'Sword and sorcery',
+        'Mythological art',
+        'Sci-fi concept art',
+        'Hard sci-fi',
+        'Space opera',
+        'Cyberpunk',
+        'Steampunk',
+        'Dieselpunk',
+        'Solarpunk',
+        'Biopunk',
+        'Post-apocalyptic',
+        'Horror illustration',
+        'Gothic horror',
+        'Cosmic horror',
+        'Lovecraftian style',
+        'Fairycore',
+        'Cottagecore',
+        'Dark academia',
+        'Light academia',
+        'Japanese ukiyo-e',
+        'Sumi-e ink wash painting',
+        'Chinese brush painting',
+        'Korean minhwa',
+        'Persian miniature',
+        'Mughal miniature',
+        'Indian miniature painting',
+        'Tibetan thangka',
+        'Islamic geometric art',
+        'African tribal art',
+        'Aboriginal dot painting',
+        'Mesoamerican art style',
+        'Folk art',
+        'Naïve art',
+        'Outsider art',
+        'Oil on canvas',
+        'Acrylic on canvas',
+        'Watercolor on paper',
+        'Ink wash',
+        'Mixed media',
+        'Collage',
+        'Paper cut-out',
+        'Clay sculpture look',
+        'Marble sculpture look',
+        'Bronze sculpture look',
+        'Ceramic glaze style',
+        'Glass art style',
+        'Stained glass',
+        'Mosaic',
+        'Embroidery textile art',
+        'Tapestry style',
+        'Abstract geometric',
+        'Abstract organic',
+        'Minimal abstraction',
+        'Maximal abstraction',
+        'Generative abstraction',
+        'Glitch art',
+        'Datamosh aesthetic',
+        'Fractal art',
+        'Psychedelic art',
+        'Optical illusion art',
+        'Surreal collage',
+        'Dreamlike realism',
+        'Weirdcore',
+        'Traumacore',
+        'Kidcore',
+        'Nostalgia-core',
+        'Liminal space aesthetic',
+        'Analog horror',
+        'Backrooms aesthetic',
+        'AI-dreamlike surrealism',
+        'Moodboard aesthetic',
+        'Pinterest-style aesthetic'
+    ];
+
+    // Three word lists for Swadesh-style combinations
+    const wordLists = {
+        list1: [
+            'I', 'you', 'they', 'we',
+            'this', 'that', 'here', 'there', 'who', 'what', 'where', 'when', 'how', 'not',
+            'all', 'many', 'some', 'few', 'other', 'one', 'two', 'three', 'four', 'five',
+            'big', 'long', 'wide', 'thick', 'heavy', 'small', 'short', 'narrow', 'thin',
+            'woman', 'man', 'human being', 'child', 'wife', 'husband',
+            'mother', 'father', 'animal', 'fish', 'bird', 'dog', 'louse', 'snake', 'worm',
+            'tree', 'forest', 'stick', 'fruit', 'seed', 'leaf', 'root', 'tree bark',
+            'flower', 'grass', 'rope', 'skin', 'meat', 'blood', 'bone', 'fat', 'egg',
+            'horn', 'tail', 'feather', 'hair', 'head', 'ear', 'eye', 'nose', 'mouth', 'tooth',
+            'tongue', 'fingernail', 'foot', 'leg', 'knee', 'hand', 'wing', 'belly',
+            'guts', 'neck', 'back', 'breast', 'heart', 'liver', 'drink', 'eat', 'bite', 'suck',
+            'spit', 'vomit', 'blow', 'breathe', 'laugh', 'see', 'hear', 'know', 'think',
+            'smell', 'fear', 'sleep', 'live', 'die', 'kill', 'fight', 'hunt', 'hit', 'cut',
+            'split', 'stab', 'scratch', 'dig', 'swim', 'fly', 'walk', 'come', 'lie',
+            'sit', 'stand', 'turn', 'fall', 'give', 'hold', 'squeeze', 'rub',
+            'wash', 'wipe', 'pull', 'push', 'throw', 'tie', 'sew', 'count', 'say', 'sing',
+            'play', 'float', 'flow', 'freeze', 'swell', 'sun', 'moon', 'star', 'water', 'rain',
+            'river', 'lake', 'sea', 'salt', 'stone', 'sand', 'dust', 'earth', 'cloud', 'fog',
+            'sky', 'wind', 'snow', 'ice', 'smoke', 'fire', 'ash', 'burn', 'road', 'mountain',
+            'red', 'green', 'yellow', 'white', 'black', 'night', 'day', 'year', 'warm', 'cold',
+            'full', 'new', 'old', 'good', 'bad', 'rotten', 'dirty', 'straight', 'round',
+            'sharp', 'dull', 'smooth', 'wet', 'dry', 'correct',
+            'near', 'far', 'right', 'left', 'at', 'in', 'with', 'and', 'if', 'because', 'name'
+        ],
+        list2: [
+            'I', 'you', 'they', 'we',
+            'this', 'that', 'here', 'there', 'who', 'what', 'where', 'when', 'how', 'not',
+            'all', 'many', 'some', 'few', 'other', 'one', 'two', 'three', 'four', 'five',
+            'big', 'long', 'wide', 'thick', 'heavy', 'small', 'short', 'narrow', 'thin',
+            'woman', 'man', 'human being', 'child', 'wife', 'husband',
+            'mother', 'father', 'animal', 'fish', 'bird', 'dog', 'louse', 'snake', 'worm',
+            'tree', 'forest', 'stick', 'fruit', 'seed', 'leaf', 'root', 'tree bark',
+            'flower', 'grass', 'rope', 'skin', 'meat', 'blood', 'bone', 'fat', 'egg',
+            'horn', 'tail', 'feather', 'hair', 'head', 'ear', 'eye', 'nose', 'mouth', 'tooth',
+            'tongue', 'fingernail', 'foot', 'leg', 'knee', 'hand', 'wing', 'belly',
+            'guts', 'neck', 'back', 'breast', 'heart', 'liver', 'drink', 'eat', 'bite', 'suck',
+            'spit', 'vomit', 'blow', 'breathe', 'laugh', 'see', 'hear', 'know', 'think',
+            'smell', 'fear', 'sleep', 'live', 'die', 'kill', 'fight', 'hunt', 'hit', 'cut',
+            'split', 'stab', 'scratch', 'dig', 'swim', 'fly', 'walk', 'come', 'lie',
+            'sit', 'stand', 'turn', 'fall', 'give', 'hold', 'squeeze', 'rub',
+            'wash', 'wipe', 'pull', 'push', 'throw', 'tie', 'sew', 'count', 'say', 'sing',
+            'play', 'float', 'flow', 'freeze', 'swell', 'sun', 'moon', 'star', 'water', 'rain',
+            'river', 'lake', 'sea', 'salt', 'stone', 'sand', 'dust', 'earth', 'cloud', 'fog',
+            'sky', 'wind', 'snow', 'ice', 'smoke', 'fire', 'ash', 'burn', 'road', 'mountain',
+            'red', 'green', 'yellow', 'white', 'black', 'night', 'day', 'year', 'warm', 'cold',
+            'full', 'new', 'old', 'good', 'bad', 'rotten', 'dirty', 'straight', 'round',
+            'sharp', 'dull', 'smooth', 'wet', 'dry', 'correct',
+            'near', 'far', 'right', 'left', 'at', 'in', 'with', 'and', 'if', 'because', 'name'
+        ],
+        list3: [
+            'I', 'you', 'they', 'we',
+            'this', 'that', 'here', 'there', 'who', 'what', 'where', 'when', 'how', 'not',
+            'all', 'many', 'some', 'few', 'other', 'one', 'two', 'three', 'four', 'five',
+            'big', 'long', 'wide', 'thick', 'heavy', 'small', 'short', 'narrow', 'thin',
+            'woman', 'man', 'human being', 'child', 'wife', 'husband',
+            'mother', 'father', 'animal', 'fish', 'bird', 'dog', 'louse', 'snake', 'worm',
+            'tree', 'forest', 'stick', 'fruit', 'seed', 'leaf', 'root', 'tree bark',
+            'flower', 'grass', 'rope', 'skin', 'meat', 'blood', 'bone', 'fat', 'egg',
+            'horn', 'tail', 'feather', 'hair', 'head', 'ear', 'eye', 'nose', 'mouth', 'tooth',
+            'tongue', 'fingernail', 'foot', 'leg', 'knee', 'hand', 'wing', 'belly',
+            'guts', 'neck', 'back', 'breast', 'heart', 'liver', 'drink', 'eat', 'bite', 'suck',
+            'spit', 'vomit', 'blow', 'breathe', 'laugh', 'see', 'hear', 'know', 'think',
+            'smell', 'fear', 'sleep', 'live', 'die', 'kill', 'fight', 'hunt', 'hit', 'cut',
+            'split', 'stab', 'scratch', 'dig', 'swim', 'fly', 'walk', 'come', 'lie',
+            'sit', 'stand', 'turn', 'fall', 'give', 'hold', 'squeeze', 'rub',
+            'wash', 'wipe', 'pull', 'push', 'throw', 'tie', 'sew', 'count', 'say', 'sing',
+            'play', 'float', 'flow', 'freeze', 'swell', 'sun', 'moon', 'star', 'water', 'rain',
+            'river', 'lake', 'sea', 'salt', 'stone', 'sand', 'dust', 'earth', 'cloud', 'fog',
+            'sky', 'wind', 'snow', 'ice', 'smoke', 'fire', 'ash', 'burn', 'road', 'mountain',
+            'red', 'green', 'yellow', 'white', 'black', 'night', 'day', 'year', 'warm', 'cold',
+            'full', 'new', 'old', 'good', 'bad', 'rotten', 'dirty', 'straight', 'round',
+            'sharp', 'dull', 'smooth', 'wet', 'dry', 'correct',
+            'near', 'far', 'right', 'left', 'at', 'in', 'with', 'and', 'if', 'because', 'name'
+        ]
+    };
+        let currentWords = [];
+        let currentSeed = 0;
+
+        // Seeded random number generator
+        function seededRandom(seed) {
+            const x = Math.sin(seed++) * 10000;
+            return x - Math.floor(x);
+        }
+
+        function shuffleWords() {
+            // Generate new random seed
+            currentSeed = Math.floor(Math.random() * 1000000);
+
+            // Select unique words from each list
+            const selectedWords = [];
+            let seedOffset = 0;
+
+            // Select from list1
+            let word1 = wordLists.list1[Math.floor(seededRandom(currentSeed + seedOffset) * wordLists.list1.length)];
+            selectedWords.push(word1);
+            seedOffset++;
+
+            // Select from list2, ensure it's different from word1
+            let word2;
+            let attempts = 0;
+            do {
+                word2 = wordLists.list2[Math.floor(seededRandom(currentSeed + seedOffset) * wordLists.list2.length)];
+                seedOffset++;
+                attempts++;
+            } while (selectedWords.includes(word2) && attempts < 100);
+            selectedWords.push(word2);
+
+            // Select from list3, ensure it's different from word1 and word2
+            let word3;
+            attempts = 0;
+            do {
+                word3 = wordLists.list3[Math.floor(seededRandom(currentSeed + seedOffset) * wordLists.list3.length)];
+                seedOffset++;
+                attempts++;
+            } while (selectedWords.includes(word3) && attempts < 100);
+            selectedWords.push(word3);
+
+            currentWords = [word1, word2, word3];
+
+            // Display the words
+            const wordsDisplay = document.getElementById('wordsDisplay');
+            wordsDisplay.classList.remove('empty');
+            wordsDisplay.innerHTML = `
+                <div>Your random words:</div>
+                <div class="word-list">
+                    <div class="word-item">${word1}</div>
+                    <div class="word-item">${word2}</div>
+                    <div class="word-item">${word3}</div>
+                </div>
+            `;
+
+            // Enable generate button
+            document.getElementById('generateBtn').disabled = false;
+
+            // Hide previous image and error
+            document.getElementById('imageContainer').classList.remove('active');
+            document.getElementById('errorMessage').classList.remove('active');
+        }
+
+        async function generateImage() {
+            if (currentWords.length === 0) {
+                showError('Please shuffle words first!');
+                return;
+            }
+
+            // Generate random seed for style selection
+            const styleSeed = Math.floor(Math.random() * 1000000);
+
+            // Select random style
+            const styleIndex = Math.floor(seededRandom(styleSeed) * artStyles.length);
+            const style = artStyles[styleIndex];
+
+            // Create prompt with art style
+            const prompt = `Make an image entitled "${currentWords.join(' ')}".
+
+Composition Constraints
+	•	Create a SINGLE, UNIFIED image composition within the frame.
+	•	Do NOT create split images, diptychs, triptychs, or multiple panels.
+	•	Do NOT create side-by-side comparisons, before/after compositions, or separate scenes within the frame.
+	•	The entire image must be a holistic, integrated interpretation of the prompt.
+	•	All elements must exist within one cohesive visual space.
+
+Style Assignment
+The image must be rendered strictly in the style of ${style}. This style governs all aspects of the image including:
+	•	Form and structure
+	•	Composition and layout
+	•	Visual language and expressiveness
+	•	Use of space, balance, and hierarchy
+
+Style Integrity Constraints
+	•	Do not introduce visual traits from styles other than ${style}.
+	•	Do not default to photorealism, contemporary illustration, cinematic lighting, or generic AI aesthetics unless explicitly part of the named style.
+	•	Maintain consistent adherence to the defining characteristics of ${style}.
+
+Content Constraints
+	•	Do not include any text, lettering, symbols, signage, or readable characters unless explicitly requested.
+	•	Do not include stylistic elements that imply typography or graphic design unless required by the style itself.
+
+Validation Requirement
+The final image should be visually explainable as:
+"A single, unified image rendered in ${style} style depicting ${currentWords.join(' ')}."`;
+
+            // Create simplified display prompt for user
+            const displayPrompt = `Make an image entitled "${currentWords.join(' ')}". The style is ${style}. [Word seed: ${currentSeed}, Style seed: ${styleSeed}]`;
+
+            // Disable buttons
+            document.getElementById('shuffleBtn').disabled = true;
+            document.getElementById('generateBtn').disabled = true;
+
+            // Show loading spinner
+            document.getElementById('loadingContainer').classList.add('active');
+            document.getElementById('imageContainer').classList.remove('active');
+            document.getElementById('errorMessage').classList.remove('active');
+
+            try {
+                // Call Vercel API endpoint
+                const response = await fetch('/api/generate-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        words: currentWords
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('Full error response:', errorData);
+                    throw new Error(errorData.error || 'Failed to generate image');
+                }
+
+                const data = await response.json();
+
+                // Hide loading spinner
+                document.getElementById('loadingContainer').classList.remove('active');
+
+                // Display image
+                document.getElementById('generatedImage').src = data.imageUrl;
+                document.getElementById('imagePrompt').textContent = `Prompt: "${displayPrompt}"`;
+                document.getElementById('imageContainer').classList.add('active');
+
+            } catch (error) {
+                console.error('Error generating image:', error);
+                console.error('Current words:', currentWords);
+                console.error('Prompt used:', prompt);
+                document.getElementById('loadingContainer').classList.remove('active');
+                showError(`Error: ${error.message}. Words: ${currentWords.join(', ')}`);
+            } finally {
+                // Re-enable buttons
+                document.getElementById('shuffleBtn').disabled = false;
+                document.getElementById('generateBtn').disabled = false;
+            }
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.classList.add('active');
+        }
+    </script>
+</body>
+</html>
