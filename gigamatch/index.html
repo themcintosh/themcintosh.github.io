@@ -532,26 +532,7 @@
             const style = artStyles[styleIndex];
 
             // Create prompt with art style
-            const prompt = `Make an image entitled "${currentWords.join(' ')}".
-
-Composition Constraints
-	•	Create a SINGLE, UNIFIED image composition within the frame.
-	•	Do NOT create split images, diptychs, triptychs, or multiple panels.
-	•	Do NOT create side-by-side comparisons, before/after compositions, or separate scenes within the frame.
-	•	The entire image must be a holistic, integrated interpretation of the prompt.
-	•	All elements must exist within one cohesive visual space.
-
-Style Assignment
-The image must be rendered strictly in the style of ${style}. This style governs all aspects of the image including:
-	•	Form and structure
-	•	Composition and layout
-	•	Visual language and expressiveness
-	•	Use of space, balance, and hierarchy
-
-Style Integrity Constraints
-	•	Do not introduce visual traits from styles other than ${style}.
-	•	Do not default to photorealism, contemporary illustration, cinematic lighting, or generic AI aesthetics unless explicitly part of the named style.
-	•	Maintain consistent adherence to the defining characteristics of ${style}.`;
+            const prompt = `Create a single unified image depicting "${currentWords.join(' ')}" in the style of ${style}. The entire composition must be cohesive with all elements integrated into one visual space. Do not create split images, multiple panels, or side-by-side comparisons. Render strictly in ${style} style without introducing traits from other styles or defaulting to photorealism or generic AI aesthetics. Maintain the defining characteristics of ${style} throughout.`;
 
             // Create simplified display prompt for user
             const displayPrompt = `Make an image entitled "${currentWords.join(' ')}". The style is ${style}. [Word seed: ${currentSeed}, Style seed: ${styleSeed}]`;
