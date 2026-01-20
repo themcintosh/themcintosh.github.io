@@ -1,7 +1,6 @@
 // API Configuration
-// When deploying frontend to GitHub Pages, set this to your Vercel deployment URL
-// For local development with Vercel, you can use relative paths: const API_BASE_URL = '';
-const API_BASE_URL = 'https://phrases.vercel.app';
+// Using relative paths since everything is deployed to Vercel
+const API_BASE_URL = '';
 
 // Global variable
 let currentPhrase = null;
@@ -20,7 +19,7 @@ async function generatePhrase() {
         hideError();
 
         // Call serverless function to generate phrase
-        const response = await fetch(`${API_BASE_URL}/api/generate-phrase`, {
+        const response = await fetch(`${API_BASE_URL}/api/phrases-generate`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -80,7 +79,7 @@ async function interpretPhrase() {
         hideError();
         interpretationDisplay.style.display = 'none';
 
-        const response = await fetch(`${API_BASE_URL}/api/interpret`, {
+        const response = await fetch(`${API_BASE_URL}/api/phrases-interpret`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
