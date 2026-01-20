@@ -24,12 +24,10 @@ export default async function handler(req, res) {
 
         // Prepare the request body
         const requestBody = {
-            model: 'dall-e-3',
+            model: 'dall-e-2',
             prompt: prompt,
             n: 1,
             size: '1024x1024',
-            style: 'vivid',
-            quality: 'standard',
         }
 
         console.log('Request body:', JSON.stringify(requestBody, null, 2));
