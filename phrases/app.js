@@ -19,7 +19,7 @@ async function generatePhrase() {
         hideError();
 
         // Call serverless function to generate phrase
-        const response = await fetch(`${API_BASE_URL}/api/phrases-generate`, {
+        const response = await fetch(`${API_BASE_URL}/api/generate-phrase`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -79,7 +79,7 @@ async function interpretPhrase() {
         hideError();
         interpretationDisplay.style.display = 'none';
 
-        const response = await fetch(`${API_BASE_URL}/api/phrases-interpret`, {
+        const response = await fetch(`${API_BASE_URL}/api/interpret`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
