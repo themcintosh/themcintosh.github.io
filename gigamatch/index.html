@@ -539,7 +539,6 @@ Composition Constraints
 	•	Do NOT create split images, diptychs, triptychs, or multiple panels.
 	•	Do NOT create side-by-side comparisons, before/after compositions, or separate scenes within the frame.
 	•	The entire image must be a holistic, integrated interpretation of the prompt.
-	•	All elements must exist within one cohesive visual space.
 
 Style Assignment
 The image must be rendered strictly in the style of ${style}. This style governs all aspects of the image including:
@@ -548,11 +547,10 @@ The image must be rendered strictly in the style of ${style}. This style governs
 	•	Visual language and expressiveness
 	•	Use of space, balance, and hierarchy
 
-Style Integrity Constraints
+Style Constraints
 	•	Do not introduce visual traits from styles other than ${style}.
 	•	Do not default to photorealism, contemporary illustration, cinematic lighting, or generic AI aesthetics unless explicitly part of the named style.
-	•	Maintain consistent adherence to the defining characteristics of ${style}.`;
-
+	
             // Create simplified display prompt for user
             const displayPrompt = `Make an image entitled "${currentWords.join(' ')}". The style is ${style}. [Word seed: ${currentSeed}, Style seed: ${styleSeed}]`;
 
