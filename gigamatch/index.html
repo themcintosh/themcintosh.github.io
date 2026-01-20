@@ -553,14 +553,6 @@ Style Integrity Constraints
 	•	Do not default to photorealism, contemporary illustration, cinematic lighting, or generic AI aesthetics unless explicitly part of the named style.
 	•	Maintain consistent adherence to the defining characteristics of ${style}.
 
-Content Constraints
-	•	Do not include any text, lettering, symbols, signage, or readable characters unless explicitly requested.
-	•	Do not include stylistic elements that imply typography or graphic design unless required by the style itself.
-
-Validation Requirement
-The final image should be visually explainable as:
-"A single, unified image rendered in ${style} style depicting ${currentWords.join(' ')}."`;
-
             // Create simplified display prompt for user
             const displayPrompt = `Make an image entitled "${currentWords.join(' ')}". The style is ${style}. [Word seed: ${currentSeed}, Style seed: ${styleSeed}]`;
 
