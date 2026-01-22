@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Rating Study</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .instructions {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .trial-container {
+            display: none;
+        }
+
+        .trial-container.active {
+            display: block;
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        @media (max-width: 1200px) {
+            .images-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .images-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .image-item {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 15px;
+            align-items: start;
+        }
+
+        .image-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .image-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: contain;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .image-label {
+            font-weight: bold;
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .likert-scale {
+            margin: 15px 0;
+        }
+
+        .likert-scale label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .likert-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .likert-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .likert-option input[type="radio"] {
+            margin-bottom: 5px;
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+        }
+
+        .likert-option span {
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+        }
+
+        .ranking-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 10px;
+            min-width: 120px;
+        }
+
+        .ranking-section label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: #555;
+            text-align: center;
+            width: 100%;
+        }
+
+        .ranking-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .ranking-options label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: normal;
+            min-width: 80px;
+        }
+
+        .ranking-options label:hover {
+            border-color: #2196F3;
+            background: #f0f8ff;
+        }
+
+        .ranking-options input[type="radio"]:checked + span {
+            font-weight: bold;
+        }
+
+        .ranking-options label:has(input:checked) {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+
+        .ranking-options input[type="radio"] {
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 15px 0;
+            display: none;
+            border-left: 4px solid #d32f2f;
+        }
+
+        .button-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .demographics {
+            display: none;
+        }
+
+        .demographics.active {
+            display: block;
+        }
+
+        .demo-field {
+            margin: 20px 0;
+        }
+
+        .demo-field label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .demo-field select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .completion-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .completion-message.active {
+            display: block;
+        }
+
+        .completion-message h2 {
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+
+        #finalData {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+
+        .attention-check {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 768px) {
+            .image-item {
+                grid-template-columns: 1fr;
+            }
+
+            .ranking-section {
+                align-items: center;
+                border-top: 2px solid #e0e0e0;
+                padding-top: 15px;
+                margin-top: 15px;
+            }
+
+            .ranking-options {
+                flex-direction: row;
+                justify-content: center;
+            }
+
+            .ranking-options label {
+                min-width: auto;
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Image Rating Study</h1>
+
+        <!-- Hidden field for MTurk data submission -->
+        <input type="hidden" id="studyData" name="studyData" value="">
+
+        <!-- Instructions -->
+        <div class="instructions" id="instructionsSection">
+            <h3>Instructions</h3>
+            <p>Thank you for participating in this study! You will be shown 20 sets of images, with 3 images in each set.</p>
+            <p><strong>For each set, you will:</strong></p>
+            <ol>
+                <li>Rate each image on artistic merit using a 1-5 scale (1 = Strongly Disagree, 5 = Strongly Agree)</li>
+                <li>Rank the three images from best (1) to worst (3)</li>
+            </ol>
+            <p><strong>Important:</strong> Please view each image carefully and provide thoughtful ratings. The entire study takes approximately 10-15 minutes.</p>
+            <button onclick="startStudy()">Start Study</button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar" id="progressBar" style="display: none;">
+            <div class="progress-fill" id="progressFill">Set 0 of 20</div>
+        </div>
+
+        <!-- Trial Screens -->
+        <div id="trialsContainer"></div>
+
+        <!-- Demographics -->
+        <div class="demographics" id="demographicsSection">
+            <h2>Final Questions</h2>
+            <p>Please answer a few brief demographic questions:</p>
+
+            <div class="demo-field">
+                <label for="age">Age Range:</label>
+                <select id="age" required>
+                    <option value="">Select...</option>
+                    <option value="18-24">18-24</option>
+                    <option value="25-34">25-34</option>
+                    <option value="35-44">35-44</option>
+                    <option value="45-54">45-54</option>
+                    <option value="55-64">55-64</option>
+                    <option value="65+">65+</option>
+                    <option value="prefer-not">Prefer not to say</option>
+                </select>
+            </div>
+
+            <div class="demo-field">
+                <label for="gender">Gender:</label>
+                <select id="gender" required>
+                    <option value="">Select...</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="non-binary">Non-binary</option>
+                    <option value="other">Other</option>
+                    <option value="prefer-not">Prefer not to say</option>
+                </select>
+            </div>
+
+            <div class="demo-field">
+                <label for="education">Highest Level of Education:</label>
+                <select id="education" required>
+                    <option value="">Select...</option>
+                    <option value="high-school">High school or less</option>
+                    <option value="some-college">Some college</option>
+                    <option value="associate">Associate degree</option>
+                    <option value="bachelor">Bachelor's degree</option>
+                    <option value="master">Master's degree</option>
+                    <option value="doctorate">Doctorate degree</option>
+                    <option value="prefer-not">Prefer not to say</option>
+                </select>
+            </div>
+
+            <div class="error-message" id="demoError">Please answer all demographic questions.</div>
+
+            <div class="button-container">
+                <button onclick="submitDemographics()">Submit</button>
+            </div>
+        </div>
+
+        <!-- Completion -->
+        <div class="completion-message" id="completionSection">
+            <h2>Thank you for completing the study!</h2>
+            <p>Your responses have been recorded. Please copy the code below and paste it into MTurk to receive payment.</p>
+            <h3>Completion Code:</h3>
+            <textarea id="finalData" readonly></textarea>
+            <p style="margin-top: 20px; color: #666; font-size: 14px;">
+                <strong>Note:</strong> This data has been automatically submitted. You can now close this window.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // ====== CONFIGURATION SECTION ======
+        // REPLACE THESE URLs WITH YOUR ACTUAL IMAGE URLS
+        const IMAGE_SETS = [
+           // Set 1
+['https://ggrp.org/storage/images/image1a.jpeg', 'https://ggrp.org/storage/images/image1b.jpeg', 'https://ggrp.org/storage/images/image1c.jpeg'],
+// Set 2
+['https://ggrp.org/storage/images/image2a.jpeg', 'https://ggrp.org/storage/images/image2b.jpeg', 'https://ggrp.org/storage/images/image2c.jpeg'],
+// Set 3
+['https://ggrp.org/storage/images/image3a.jpeg', 'https://ggrp.org/storage/images/image3b.jpeg', 'https://ggrp.org/storage/images/image3c.jpeg'],
+// Set 4
+['https://ggrp.org/storage/images/image4a.jpeg', 'https://ggrp.org/storage/images/image4b.jpeg', 'https://ggrp.org/storage/images/image4c.jpeg'],
+// Set 5
+['https://ggrp.org/storage/images/image5a.jpeg', 'https://ggrp.org/storage/images/image5b.jpeg', 'https://ggrp.org/storage/images/image5c.jpeg'],
+// Set 6
+['https://ggrp.org/storage/images/image6a.jpeg', 'https://ggrp.org/storage/images/image6b.jpeg', 'https://ggrp.org/storage/images/image6c.jpeg'],
+// Set 7
+['https://ggrp.org/storage/images/image7a.jpeg', 'https://ggrp.org/storage/images/image7b.jpeg', 'https://ggrp.org/storage/images/image7c.jpeg'],
+// Set 8
+['https://ggrp.org/storage/images/image8a.jpeg', 'https://ggrp.org/storage/images/image8b.jpeg', 'https://ggrp.org/storage/images/image8c.jpeg'],
+// Set 9
+['https://ggrp.org/storage/images/image9a.jpeg', 'https://ggrp.org/storage/images/image9b.jpeg', 'https://ggrp.org/storage/images/image9c.jpeg'],
+// Set 10
+['https://ggrp.org/storage/images/image10a.jpeg', 'https://ggrp.org/storage/images/image10b.jpeg', 'https://ggrp.org/storage/images/image10c.jpeg'],
+// Set 11
+['https://ggrp.org/storage/images/image11a.jpeg', 'https://ggrp.org/storage/images/image11b.jpeg', 'https://ggrp.org/storage/images/image11c.jpeg'],
+// Set 12
+['https://ggrp.org/storage/images/image12a.jpeg', 'https://ggrp.org/storage/images/image12b.jpeg', 'https://ggrp.org/storage/images/image12c.jpeg']
+        ];
+
+        // Add attention check at trial 10 (0-indexed = trial 9)
+        const ATTENTION_CHECK_TRIAL = 9;
+
+        // ====== STATE VARIABLES ======
+        let currentTrial = 0;
+        let studyData = [];
+        let randomizedSets = [];
+        let startTime;
+        let trialStartTime;
+
+        // ====== UTILITY FUNCTIONS ======
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function generateRandomID() {
+            return 'ID-' + Math.random().toString(36).substr(2, 9) + '-' + Date.now();
+        }
+
+        // ====== INITIALIZATION ======
+        function startStudy() {
+            document.getElementById('instructionsSection').style.display = 'none';
+            document.getElementById('progressBar').style.display = 'block';
+
+            // Randomize set order
+            const setIndices = Array.from({length: IMAGE_SETS.length}, (_, i) => i);
+            const randomizedIndices = shuffleArray(setIndices);
+
+            // For each set, randomize image positions
+            randomizedSets = randomizedIndices.map(setIndex => {
+                const images = IMAGE_SETS[setIndex];
+                const shuffledImages = shuffleArray(images);
+                return {
+                    originalSetIndex: setIndex,
+                    images: shuffledImages
+                };
+            });
+
+            // Generate trials
+            generateTrials();
+
+            startTime = Date.now();
+            showTrial(0);
+        }
+
+        function generateTrials() {
+            const container = document.getElementById('trialsContainer');
+
+            randomizedSets.forEach((set, trialIndex) => {
+                const trialDiv = document.createElement('div');
+                trialDiv.className = 'trial-container';
+                trialDiv.id = 'trial-' + trialIndex;
+
+                let content = '<h2>Set ' + (trialIndex + 1) + ' of 20</h2>';
+
+                // Add attention check if applicable
+                if (trialIndex === ATTENTION_CHECK_TRIAL) {
+                    content += '<div class="attention-check">' +
+                        '<strong>⚠️ Attention Check:</strong> To ensure you are paying attention, ' +
+                        'please rate the leftmost image as "3" for artistic merit.' +
+                        '</div>';
+                }
+
+                content += '<div class="images-grid">';
+
+                set.images.forEach((imageUrl, imgIndex) => {
+                    const position = ['Left', 'Center', 'Right'][imgIndex];
+                    content += '<div class="image-item">' +
+                        '<div class="image-content">' +
+                        '<div class="image-label">Image ' + position + '</div>' +
+                        '<img src="' + imageUrl + '" alt="Image ' + (imgIndex + 1) + '" ' +
+                        'onerror="this.src=\'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LXNpemU9IjE4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSIgZmlsbD0iIzk5OSI+SW1hZ2UgTm90IEZvdW5kPC90ZXh0Pjwvc3ZnPg==\'>' +
+                        '<div class="likert-scale">' +
+                        '<label>This image has artistic merit:</label>' +
+                        '<div class="likert-options">';
+
+                    // Likert scale options
+                    const likertLabels = ['Strongly<br>Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly<br>Agree'];
+                    for (let value = 1; value <= 5; value++) {
+                        content += '<div class="likert-option">' +
+                            '<input type="radio" ' +
+                            'name="likert-' + trialIndex + '-' + imgIndex + '" ' +
+                            'value="' + value + '" ' +
+                            'id="likert-' + trialIndex + '-' + imgIndex + '-' + value + '" ' +
+                            'required>' +
+                            '<span>' + likertLabels[value - 1] + '</span>' +
+                            '</div>';
+                    }
+
+                    content += '</div></div></div>' +
+                        '<div class="ranking-section">' +
+                        '<label>Rank this image:</label>' +
+                        '<div class="ranking-options">';
+
+                    // Ranking options
+                    for (let rank = 1; rank <= 3; rank++) {
+                        content += '<label>' +
+                            '<input type="radio" ' +
+                            'name="rank-' + trialIndex + '-' + imgIndex + '" ' +
+                            'value="' + rank + '" ' +
+                            'onchange="validateRankings(' + trialIndex + ')" ' +
+                            'required>' +
+                            '<span>' + rank + '</span>' +
+                            '</label>';
+                    }
+
+                    content += '</div></div></div>';
+                });
+
+                const buttonText = (trialIndex === randomizedSets.length - 1) ?
+                    'Continue to Final Questions' : 'Next Set';
+
+                content += '</div>' +
+                    '<div class="error-message" id="error-' + trialIndex + '"></div>' +
+                    '<div class="button-container">' +
+                    '<button onclick="nextTrial(' + trialIndex + ')">' +
+                    buttonText +
+                    '</button>' +
+                    '</div>';
+
+                trialDiv.innerHTML = content;
+                container.appendChild(trialDiv);
+            });
+        }
+
+        function showTrial(trialIndex) {
+            // Hide all trials
+            document.querySelectorAll('.trial-container').forEach(div => {
+                div.classList.remove('active');
+            });
+
+            // Show current trial
+            const currentTrialDiv = document.getElementById('trial-' + trialIndex);
+            if (currentTrialDiv) {
+                currentTrialDiv.classList.add('active');
+                trialStartTime = Date.now();
+                window.scrollTo(0, 0);
+            }
+
+            // Update progress
+            updateProgress(trialIndex);
+        }
+
+        function updateProgress(trialIndex) {
+            const progress = ((trialIndex) / randomizedSets.length) * 100;
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = progress + '%';
+            progressFill.textContent = 'Set ' + trialIndex + ' of ' + randomizedSets.length;
+        }
+
+        function validateRankings(trialIndex) {
+            const rankings = [0, 1, 2].map(imgIndex => {
+                const selected = document.querySelector('input[name="rank-' + trialIndex + '-' + imgIndex + '"]:checked');
+                return selected ? parseInt(selected.value) : null;
+            });
+
+            // Check for duplicates
+            const nonNullRankings = rankings.filter(r => r !== null);
+            const hasDuplicates = nonNullRankings.length !== new Set(nonNullRankings).size;
+
+            const errorDiv = document.getElementById('error-' + trialIndex);
+            if (hasDuplicates) {
+                errorDiv.textContent = 'Each image must have a unique rank (1, 2, or 3). Please adjust your rankings.';
+                errorDiv.style.display = 'block';
+                return false;
+            } else {
+                errorDiv.style.display = 'none';
+                return true;
+            }
+        }
+
+        function nextTrial(trialIndex) {
+            const errorDiv = document.getElementById('error-' + trialIndex);
+
+            // Collect data for this trial
+            const trialData = {
+                trial: trialIndex + 1,
+                setIndex: randomizedSets[trialIndex].originalSetIndex,
+                timestamp: Date.now(),
+                responseTime: Date.now() - trialStartTime,
+                images: []
+            };
+
+            // Check all Likert scales are answered
+            let allLikertAnswered = true;
+            let allRanksAnswered = true;
+
+            for (let imgIndex = 0; imgIndex < 3; imgIndex++) {
+                const likertValue = document.querySelector('input[name="likert-' + trialIndex + '-' + imgIndex + '"]:checked');
+                const rankValue = document.querySelector('input[name="rank-' + trialIndex + '-' + imgIndex + '"]:checked');
+
+                if (!likertValue) allLikertAnswered = false;
+                if (!rankValue) allRanksAnswered = false;
+
+                trialData.images.push({
+                    position: ['left', 'center', 'right'][imgIndex],
+                    imageUrl: randomizedSets[trialIndex].images[imgIndex],
+                    artisticMerit: likertValue ? parseInt(likertValue.value) : null,
+                    rank: rankValue ? parseInt(rankValue.value) : null
+                });
+            }
+
+            if (!allLikertAnswered || !allRanksAnswered) {
+                errorDiv.textContent = 'Please complete all ratings and rankings before continuing.';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Validate rankings
+            if (!validateRankings(trialIndex)) {
+                return;
+            }
+
+            // Attention check validation
+            if (trialIndex === ATTENTION_CHECK_TRIAL) {
+                const leftmostLikert = trialData.images[0].artisticMerit;
+                if (leftmostLikert !== 3) {
+                    errorDiv.textContent = 'Attention check failed. Please rate the leftmost image as "3" as instructed.';
+                    errorDiv.style.display = 'block';
+                    return;
+                }
+            }
+
+            studyData.push(trialData);
+
+            // Move to next trial or demographics
+            if (trialIndex < randomizedSets.length - 1) {
+                currentTrial++;
+                showTrial(currentTrial);
+            } else {
+                showDemographics();
+            }
+        }
+
+        function showDemographics() {
+            document.getElementById('progressBar').style.display = 'none';
+            document.querySelectorAll('.trial-container').forEach(div => {
+                div.style.display = 'none';
+            });
+            document.getElementById('demographicsSection').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        function submitDemographics() {
+            const age = document.getElementById('age').value;
+            const gender = document.getElementById('gender').value;
+            const education = document.getElementById('education').value;
+
+            const errorDiv = document.getElementById('demoError');
+
+            if (!age || !gender || !education) {
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Add demographics to data
+            const demographics = {
+                age: age,
+                gender: gender,
+                education: education
+            };
+
+            // Prepare final data
+            const finalData = {
+                participantId: generateRandomID(),
+                startTime: startTime,
+                endTime: Date.now(),
+                totalDuration: Date.now() - startTime,
+                demographics: demographics,
+                trials: studyData
+            };
+
+            // Show completion
+            document.getElementById('demographicsSection').classList.remove('active');
+            document.getElementById('completionSection').classList.add('active');
+            document.getElementById('finalData').value = JSON.stringify(finalData, null, 2);
+
+            // In MTurk, you would submit this data to the MTurk form
+            // For now, we're just displaying it
+            submitToMTurk(finalData);
+
+            window.scrollTo(0, 0);
+        }
+
+        function submitToMTurk(data) {
+            // Populate the hidden field with JSON data
+            document.getElementById('studyData').value = JSON.stringify(data);
+
+            // Log for verification
+            console.log('Study completed! Data:', data);
+
+            // Note: In the actual MTurk environment, the form will auto-submit
+            // or you can manually trigger form submission if needed
+        }
+    </script>
+</body>
+</html>
