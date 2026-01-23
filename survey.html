@@ -64,18 +64,6 @@
             margin: 30px 0;
         }
 
-        @media (max-width: 1200px) {
-            .images-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .images-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
         .image-item {
             background: #fafafa;
             padding: 20px;
@@ -293,29 +281,6 @@
             padding: 15px;
             margin: 20px 0;
             border-radius: 4px;
-        }
-
-        @media (max-width: 768px) {
-            .image-item {
-                grid-template-columns: 1fr;
-            }
-
-            .ranking-section {
-                align-items: center;
-                border-top: 2px solid #e0e0e0;
-                padding-top: 15px;
-                margin-top: 15px;
-            }
-
-            .ranking-options {
-                flex-direction: row;
-                justify-content: center;
-            }
-
-            .ranking-options label {
-                min-width: auto;
-                flex: 1;
-            }
         }
     </style>
 </head>
