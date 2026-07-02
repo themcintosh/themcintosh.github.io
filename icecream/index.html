@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lick the Cone</title>
+<style>
+  :root {
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    background: linear-gradient(180deg, #fdf3e7 0%, #fbe8d3 55%, #f6dcc0 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    touch-action: none;
+    user-select: none;
+  }
+
+  #app {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    text-align: center;
+    padding: 14px 16px 4px;
+    color: #6b4226;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: clamp(20px, 4vw, 28px);
+    letter-spacing: 0.5px;
+  }
+
+  header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #9a7355;
+  }
+
+  #stage {
+    position: relative;
+    flex: 1;
+    width: 100%;
+    max-width: 640px;
+    touch-action: none;
+  }
+
+  canvas#scene {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: grab;
+  }
+
+  canvas#scene.licking { cursor: none; }
+
+  #hud {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+    font-size: 12px;
+    color: #8a5a35;
+  }
+
+  #meterWrap {
+    background: rgba(255,255,255,0.75);
+    border: 1px solid rgba(139,94,52,0.25);
+    border-radius: 10px;
+    padding: 8px 10px;
+    backdrop-filter: blur(3px);
+    min-width: 128px;
+  }
+
+  #meterLabel {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  #meterTrack {
+    height: 8px;
+    border-radius: 5px;
+    background: #eddcc4;
+    overflow: hidden;
+  }
+
+  #meterFill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #f7b955, #e8823a);
+    transition: width 0.25s ease;
+  }
+
+  #hintBox {
+    background: rgba(255,255,255,0.75);
+    border: 1px solid rgba(139,94,52,0.25);
+    border-radius: 10px;
+    padding: 8px 10px;
+    max-width: 150px;
+    line-height: 1.35;
+    text-align: right;
+  }
+
+  #controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 16px calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .iconBtn {
+    appearance: none;
+    border: none;
+    background: #fff;
+    color: #8a5a35;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    box-shadow: 0 3px 8px rgba(139,94,52,0.25);
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+  }
+  .iconBtn:active { transform: scale(0.9); }
+
+  #resetBtn {
+    appearance: none;
+    border: none;
+    background: #e8823a;
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 22px;
+    box-shadow: 0 3px 8px rgba(139,94,52,0.3);
+    cursor: pointer;
+  }
+  #resetBtn:active { transform: scale(0.96); }
+
+  #soundBtn.muted { color: #c7a98a; }
+
+  #finishedBanner {
+    position: absolute;
+    left: 50%;
+    top: 14%;
+    transform: translate(-50%, -8px);
+    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(139,94,52,0.3);
+    padding: 10px 18px;
+    border-radius: 14px;
+    color: #a5401f;
+    font-weight: 700;
+    font-size: 15px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    white-space: nowrap;
+  }
+  #finishedBanner.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  a.backLink {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 12px;
+    color: #9a7355;
+    text-decoration: none;
+    z-index: 5;
+    background: rgba(255,255,255,0.6);
+    padding: 5px 9px;
+    border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <a class="backLink" href="/">&larr; Home</a>
+  <header>
+    <h1>🍦 Lick the Cone</h1>
+    <p>Drag across the ice cream to lick it. Drag empty space to spin the cone.</p>
+  </header>
+
+  <div id="stage">
+    <canvas id="scene"></canvas>
+    <div id="hud">
+      <div id="meterWrap">
+        <div id="meterLabel">Ice cream left</div>
+        <div id="meterTrack"><div id="meterFill"></div></div>
+      </div>
+      <div id="hintBox">Drag on the scoop to lick. Drag beside it to rotate.</div>
+    </div>
+    <div id="finishedBanner">All gone! Nice licking. 🍦</div>
+  </div>
+
+  <div id="controls">
+    <button class="iconBtn" id="rotLeftBtn" aria-label="Rotate left">&#8630;</button>
+    <button class="iconBtn" id="soundBtn" aria-label="Toggle sound">&#128266;</button>
+    <button id="resetBtn">New Cone</button>
+    <button class="iconBtn" id="rotRightBtn" aria-label="Rotate right">&#8631;</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------- Canvas setup ----------
+  const canvas = document.getElementById("scene");
+  const ctx = canvas.getContext("2d");
+  const stage = document.getElementById("stage");
+  let DPR = Math.min(window.devicePixelRatio || 1, 2.5);
+  let W = 0, H = 0;
+
+  function resize() {
+    const rect = stage.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return; // layout not settled yet
+    W = rect.width;
+    H = rect.height;
+    canvas.width = Math.round(W * DPR);
+    canvas.height = Math.round(H * DPR);
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener("resize", resize);
+  // ResizeObserver catches cases window's "resize" event misses on mobile
+  // (address bar collapsing, in-app browser chrome settling after first paint, etc).
+  if (window.ResizeObserver) {
+    new ResizeObserver(resize).observe(stage);
+  }
+  window.visualViewport && window.visualViewport.addEventListener("resize", resize);
+
+  // ---------- Ice cream mesh model ----------
+  // The scoop is modeled as a radial "lathe" surface: a grid of
+  // (angleSegment x heightLevel) cells, each storing a damage amount
+  // (0 = pristine, 1 = fully licked away at that point). Rotating the
+  // cone re-projects this same grid from a new viewing angle, so licks
+  // made on one side stay visible when you spin around to see them.
+  const ANGLE_SEGMENTS = 40;               // resolution around the cone
+  const HEIGHT_LEVELS = 15;                // resolution from scoop base to peak
+  const TWO_PI = Math.PI * 2;
+
+  let damage = new Float32Array(ANGLE_SEGMENTS * HEIGHT_LEVELS); // 0..1 per cell
+  let globalScale = 1;      // overall remaining-size factor (1 = full, shrinks as eaten)
+  let totalLickWork = 0;    // accumulator driving globalScale
+  const MIN_SCALE = 0.22;   // scoop never fully vanishes to zero -> leaves a nub, then finishes
+
+  function idx(a, l) { return l * ANGLE_SEGMENTS + a; }
+
+  function resetIceCream() {
+    damage.fill(0);
+    globalScale = 1;
+    totalLickWork = 0;
+    finished = false;
+    finishedBanner.classList.remove("show");
+    updateMeter();
+  }
+
+  // Base (undamaged) radius profile of the scoop, from base (t=0, resting on
+  // the cone rim) to peak (t=1, rounded top). Bulges out past the rim width
+  // then eases into a small rounded peak, like a hand-scooped dome.
+  function smoothstep(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
+  const RIM_FRACTION = 0.62;
+  const PEAK_T = 0.35;
+  const TOP_FRACTION = 0.14;
+  function baseProfile(t) {
+    if (t <= PEAK_T) {
+      return RIM_FRACTION + (1 - RIM_FRACTION) * smoothstep(t / PEAK_T);
+    }
+    return 1 - (1 - TOP_FRACTION) * smoothstep((t - PEAK_T) / (1 - PEAK_T));
+  }
+
+  function cellRadius(a, l, baseR) {
+    const t = l / (HEIGHT_LEVELS - 1);
+    const raw = baseProfile(t) * baseR * globalScale;
+    const d = damage[idx(a, l)];
+    return Math.max(raw * (1 - d * 0.85), 2);
+  }
+
+  // ---------- Layout constants (recomputed on resize / scale) ----------
+  let baseR = 90;
+  let coneHeight = 170;
+  let scoopSpan = 190;
+  let originX = 0, rimY = 0, tipY = 0, topY = 0;
+
+  function layout() {
+    baseR = Math.min(W, H) * 0.20;
+    coneHeight = Math.min(W, H) * 0.34;
+    scoopSpan = Math.min(W, H) * 0.40;
+    originX = W / 2;
+    rimY = H * 0.60;
+    tipY = rimY + coneHeight;
+    topY = rimY - scoopSpan;
+  }
+
+  // ---------- Rotation / view state ----------
+  let viewAngle = -Math.PI / 2 * 0.15; // slight initial turn so it doesn't look flat
+  let angularVelocity = 0; // for inertial spin after a rotate-drag release
+
+  // ---------- Pointer / gesture state ----------
+  let pointerMode = null; // 'lick' | 'rotate' | null
+  let dragPoints = [];    // {x,y,t} for the current lick stroke
+  let lastPointer = null;
+  let lastLickTime = 0;
+
+  // ---------- Audio ----------
+  let audioCtx = null;
+  let soundEnabled = true;
+
+  function ensureAudio() {
+    if (!audioCtx) {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (Ctx) audioCtx = new Ctx();
+    }
+    if (audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+
+  // Synthesizes a short "slurp": filtered noise burst with a rising-then-falling
+  // pitch sweep on the bandpass filter, plus a low suction thump. Strength (0..1)
+  // scales duration, loudness, and how far the pitch sweeps.
+  function playSlurp(strength) {
+    if (!soundEnabled) return;
+    const ac = ensureAudio();
+    if (!ac) return;
+    const now = ac.currentTime;
+    const dur = 0.16 + strength * 0.55;
+
+    const bufferSize = Math.floor(ac.sampleRate * dur);
+    const buffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    }
+    const noise = ac.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = ac.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.Q.value = 4 + strength * 6;
+    const startFreq = 500 + strength * 900;
+    const peakFreq = 1800 + strength * 2600;
+    const endFreq = 250 + strength * 300;
+    filter.frequency.setValueAtTime(startFreq, now);
+    filter.frequency.linearRampToValueAtTime(peakFreq, now + dur * 0.35);
+    filter.frequency.exponentialRampToValueAtTime(Math.max(endFreq, 60), now + dur);
+
+    const gain = ac.createGain();
+    const peakGain = 0.18 + strength * 0.35;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(peakGain, now + dur * 0.18);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+    noise.connect(filter);
+    filter.connect(gain);
+    gain.connect(ac.destination);
+    noise.start(now);
+    noise.stop(now + dur + 0.02);
+
+    // low suction "pop" thump for extra strong licks
+    if (strength > 0.35) {
+      const osc = ac.createOscillator();
+      osc.type = "sine";
+      const thumpGain = ac.createGain();
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.exponentialRampToValueAtTime(70, now + 0.12);
+      thumpGain.gain.setValueAtTime(0.0001, now);
+      thumpGain.gain.exponentialRampToValueAtTime(0.22 * strength, now + 0.02);
+      thumpGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+      osc.connect(thumpGain);
+      thumpGain.connect(ac.destination);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    }
+  }
+
+  // ---------- Projection helpers ----------
+  // For a mesh vertex at angle segment `a`, height level `l`, compute its
+  // on-screen position given the current viewAngle. Rotation is purely around
+  // the vertical axis, so height (y) is unaffected; only x and a lighting
+  // term (facing) depend on angle.
+  function angleOf(a) { return (a / ANGLE_SEGMENTS) * TWO_PI; }
+
+  function vertexScreen(a, l) {
+    const theta = angleOf(a) - viewAngle;
+    const r = cellRadius(a, l, baseR);
+    const t = l / (HEIGHT_LEVELS - 1);
+    const x = originX + Math.sin(theta) * r;
+    const y = rimY - t * scoopSpan * globalScale;
+    const facing = Math.cos(theta); // -1 (away) .. 1 (toward viewer)
+    return { x, y, r, facing, theta };
+  }
+
+  // Find nearest (a,l) cell to a given screen point, restricted to
+  // front-facing geometry (so you can only lick the side you can see).
+  function pickCell(px, py) {
+    let best = null, bestD = Infinity;
+    for (let l = 0; l < HEIGHT_LEVELS; l++) {
+      for (let a = 0; a < ANGLE_SEGMENTS; a++) {
+        const v = vertexScreen(a, l);
+        if (v.facing < -0.05) continue;
+        const dx = v.x - px, dy = v.y - py;
+        const d = dx * dx + dy * dy;
+        if (d < bestD) { bestD = d; best = { a, l, dist: Math.sqrt(d), v }; }
+      }
+    }
+    return best;
+  }
+
+  function withinLickReach(px, py) {
+    const cell = pickCell(px, py);
+    if (!cell) return null;
+    // reachable if the pointer is reasonably close to the picked surface point
+    const reach = Math.max(28, baseR * 0.55);
+    return cell.dist <= reach ? cell : null;
+  }
+
+  // ---------- Carving ----------
+  function carveAt(a, l, strength) {
+    const spreadA = 4;   // angular falloff radius, in segments
+    const spreadL = 3;   // vertical falloff radius, in levels
+    for (let dl = -spreadL; dl <= spreadL; dl++) {
+      const ll = l + dl;
+      if (ll < 0 || ll >= HEIGHT_LEVELS) continue;
+      const fl = Math.exp(-(dl * dl) / (2 * spreadL * spreadL));
+      for (let da = -spreadA; da <= spreadA; da++) {
+        let aa = (a + da) % ANGLE_SEGMENTS;
+        if (aa < 0) aa += ANGLE_SEGMENTS;
+        const fa = Math.exp(-(da * da) / (2 * spreadA * spreadA));
+        const i = idx(aa, ll);
+        const add = strength * fl * fa;
+        damage[i] = Math.min(1, damage[i] + add);
+      }
+    }
+  }
+
+  function applyLickSegment(p0, p1) {
+    const cellA = pickCell(p1.x, p1.y);
+    if (!cellA) return 0;
+    const dx = p1.x - p0.x, dy = p1.y - p0.y;
+    const dist = Math.hypot(dx, dy);
+    const dt = Math.max(1, p1.t - p0.t);
+    const speed = dist / dt; // px/ms
+    const strength = clamp(0.05 + speed * 9 + dist * 0.006, 0.03, 0.16);
+    carveAt(cellA.a, cellA.l, strength);
+    return dist;
+  }
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function finishLickGesture() {
+    if (dragPoints.length < 2) return;
+    let totalDist = 0;
+    for (let i = 1; i < dragPoints.length; i++) {
+      totalDist += Math.hypot(dragPoints[i].x - dragPoints[i - 1].x, dragPoints[i].y - dragPoints[i - 1].y);
+    }
+    const duration = Math.max(1, dragPoints[dragPoints.length - 1].t - dragPoints[0].t);
+    const speed = totalDist / duration; // px/ms average
+    // Overall lick "strength" for sound + global shrink: blend of how long the
+    // drag was (lick size) and how fast it was (lick strength).
+    const lengthFactor = clamp(totalDist / (baseR * 3), 0, 1);
+    const speedFactor = clamp(speed * 6, 0, 1);
+    const strength = clamp(lengthFactor * 0.6 + speedFactor * 0.4, 0.06, 1);
+
+    totalLickWork += totalDist * (0.35 + speedFactor * 0.65);
+    const shrink = totalLickWork / (baseR * 42);
+    globalScale = Math.max(MIN_SCALE, 1 - shrink);
+
+    playSlurp(strength);
+    updateMeter();
+    spawnSparkles(strength);
+  }
+
+  // ---------- Sparkle / lick particles (pure decoration, drawn on canvas) ----------
+  let sparkles = [];
+  function spawnSparkles(strength) {
+    if (dragPoints.length === 0) return;
+    const mid = dragPoints[Math.floor(dragPoints.length / 2)];
+    const n = Math.round(4 + strength * 8);
+    for (let i = 0; i < n; i++) {
+      const ang = Math.random() * TWO_PI;
+      const spd = 0.6 + Math.random() * 1.8 * strength;
+      sparkles.push({
+        x: mid.x, y: mid.y,
+        vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - 1.2,
+        life: 1, r: 1.5 + Math.random() * 2
+      });
+    }
+  }
+  function updateSparkles(dt) {
+    for (const s of sparkles) {
+      s.x += s.vx * dt; s.y += s.vy * dt;
+      s.vy += 0.06 * dt;
+      s.life -= 0.02 * dt;
+    }
+    sparkles = sparkles.filter(s => s.life > 0);
+  }
+
+  // ---------- UI wiring ----------
+  const meterFill = document.getElementById("meterFill");
+  const finishedBanner = document.getElementById("finishedBanner");
+  const hintBox = document.getElementById("hintBox");
+  const soundBtn = document.getElementById("soundBtn");
+  const resetBtn = document.getElementById("resetBtn");
+  const rotLeftBtn = document.getElementById("rotLeftBtn");
+  const rotRightBtn = document.getElementById("rotRightBtn");
+
+  let finished = false;
+
+  function remainingFraction() {
+    // Combine global shrink with average local damage for a fuller sense of "eaten".
+    let dsum = 0;
+    for (let i = 0; i < damage.length; i++) dsum += damage[i];
+    const avgDamage = dsum / damage.length;
+    const norm = (globalScale - MIN_SCALE) / (1 - MIN_SCALE);
+    const remaining = clamp(norm * (1 - avgDamage * 0.5), 0, 1);
+    return remaining;
+  }
+
+  function updateMeter() {
+    const remaining = remainingFraction();
+    meterFill.style.width = Math.round(remaining * 100) + "%";
+    if (!finished && remaining < 0.06) {
+      finished = true;
+      finishedBanner.classList.add("show");
+    } else if (finished && remaining >= 0.06) {
+      finished = false;
+      finishedBanner.classList.remove("show");
+    }
+  }
+
+  soundBtn.addEventListener("click", () => {
+    soundEnabled = !soundEnabled;
+    soundBtn.classList.toggle("muted", !soundEnabled);
+    soundBtn.innerHTML = soundEnabled ? "&#128266;" : "&#128263;";
+    if (soundEnabled) ensureAudio();
+  });
+
+  resetBtn.addEventListener("click", () => {
+    resetIceCream();
+  });
+
+  rotLeftBtn.addEventListener("click", () => { angularVelocity -= 0.35; });
+  rotRightBtn.addEventListener("click", () => { angularVelocity += 0.35; });
+
+  // ---------- Pointer handling ----------
+  function getPos(evt) {
+    const rect = canvas.getBoundingClientRect();
+    const t = evt.touches ? evt.touches[0] : evt;
+    return { x: t.clientX - rect.left, y: t.clientY - rect.top, t: performance.now() };
+  }
+
+  function onPointerDown(evt) {
+    evt.preventDefault();
+    ensureAudio();
+    const p = getPos(evt);
+    const cell = withinLickReach(p.x, p.y);
+    if (cell) {
+      pointerMode = "lick";
+      canvas.classList.add("licking");
+      hintBox.style.opacity = "0";
+    } else {
+      pointerMode = "rotate";
+    }
+    dragPoints = [p];
+    lastPointer = p;
+    angularVelocity = 0;
+  }
+
+  function onPointerMove(evt) {
+    if (!pointerMode) return;
+    evt.preventDefault();
+    const p = getPos(evt);
+    if (pointerMode === "lick") {
+      dragPoints.push(p);
+      const dist = applyLickSegment(lastPointer, p);
+      if (dist > 0 && p.t - lastLickTime > 55) {
+        lastLickTime = p.t;
+      }
+    } else if (pointerMode === "rotate") {
+      const dx = p.x - lastPointer.x;
+      angularVelocity = dx * 0.006;
+      viewAngle += dx * 0.011;
+    }
+    lastPointer = p;
+  }
+
+  function onPointerUp(evt) {
+    if (!pointerMode) return;
+    if (pointerMode === "lick") {
+      finishLickGesture();
+    }
+    pointerMode = null;
+    dragPoints = [];
+    canvas.classList.remove("licking");
+  }
+
+  canvas.addEventListener("mousedown", onPointerDown);
+  window.addEventListener("mousemove", onPointerMove);
+  window.addEventListener("mouseup", onPointerUp);
+  canvas.addEventListener("touchstart", onPointerDown, { passive: false });
+  window.addEventListener("touchmove", onPointerMove, { passive: false });
+  window.addEventListener("touchend", onPointerUp);
+  window.addEventListener("touchcancel", onPointerUp);
+
+  // ---------- Rendering ----------
+  const CONE_COLOR_A = "#d99a52";
+  const CONE_COLOR_B = "#c17f38";
+  const CREAM_HUE = { h: 42, s: 55, l: 92 }; // pale vanilla base
+
+  function drawCone() {
+    // Static waffle cone (radially symmetric, so rotation doesn't change its silhouette).
+    const rimHalf = baseR * 0.78;
+    ctx.save();
+    const grad = ctx.createLinearGradient(originX - rimHalf, rimY, originX + rimHalf, tipY);
+    grad.addColorStop(0, CONE_COLOR_A);
+    grad.addColorStop(1, CONE_COLOR_B);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(originX - rimHalf, rimY);
+    ctx.lineTo(originX + rimHalf, rimY);
+    ctx.lineTo(originX, tipY);
+    ctx.closePath();
+    ctx.fill();
+
+    // waffle crosshatch, subtly shifting with viewAngle for a rotation cue
+    ctx.save();
+    ctx.clip();
+    ctx.strokeStyle = "rgba(120,68,20,0.35)";
+    ctx.lineWidth = 1.4;
+    const shift = (viewAngle * 18) % 20;
+    for (let i = -6; i < 14; i++) {
+      const off = i * 20 + shift;
+      ctx.beginPath();
+      ctx.moveTo(originX - rimHalf + off, rimY);
+      ctx.lineTo(originX - rimHalf + off - (tipY - rimY) * 0.6, tipY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(originX + rimHalf - off, rimY);
+      ctx.lineTo(originX + rimHalf - off + (tipY - rimY) * 0.6, tipY);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    ctx.strokeStyle = "rgba(120,68,20,0.55)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(originX - rimHalf, rimY);
+    ctx.lineTo(originX + rimHalf, rimY);
+    ctx.lineTo(originX, tipY);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function creamColorForFacing(facing, damageAvg, swirlPhase) {
+    // Soft-serve swirl banding (fixed to the object's own angle, so it turns
+    // with the cone) layered under lighting-by-facing and a matte tone where licked.
+    const swirl = Math.sin(swirlPhase) * 3.5;
+    const l = clamp(CREAM_HUE.l - (1 - facing) * 10 - damageAvg * 14 + swirl, 55, 97);
+    const s = clamp(CREAM_HUE.s + damageAvg * 8 - swirl * 0.6, 30, 70);
+    return `hsl(${CREAM_HUE.h}, ${s}%, ${l}%)`;
+  }
+
+  function drawScoop() {
+    // Build quad faces between adjacent angle samples & height levels, then
+    // paint back-to-front (simple painter's algorithm) using facing as depth.
+    const faces = [];
+    for (let l = 0; l < HEIGHT_LEVELS - 1; l++) {
+      for (let a = 0; a < ANGLE_SEGMENTS; a++) {
+        const a2 = (a + 1) % ANGLE_SEGMENTS;
+        const v00 = vertexScreen(a, l);
+        const v10 = vertexScreen(a2, l);
+        const v01 = vertexScreen(a, l + 1);
+        const v11 = vertexScreen(a2, l + 1);
+        const avgFacing = (v00.facing + v10.facing + v01.facing + v11.facing) / 4;
+        if (avgFacing < -0.35) continue; // fully back-facing, skip for perf
+        const dAvg = (damage[idx(a, l)] + damage[idx(a2, l)] + damage[idx(a, l + 1)] + damage[idx(a2, l + 1)]) / 4;
+        const swirlPhase = (a / ANGLE_SEGMENTS) * TWO_PI * 3 + (l / HEIGHT_LEVELS) * 5;
+        faces.push({ v00, v10, v11, v01, depth: avgFacing, dAvg, swirlPhase });
+      }
+    }
+    faces.sort((f1, f2) => f1.depth - f2.depth);
+
+    for (const f of faces) {
+      const { v00, v10, v11, v01 } = f;
+      ctx.beginPath();
+      ctx.moveTo(v00.x, v00.y);
+      ctx.lineTo(v10.x, v10.y);
+      ctx.lineTo(v11.x, v11.y);
+      ctx.lineTo(v01.x, v01.y);
+      ctx.closePath();
+      ctx.fillStyle = creamColorForFacing(f.depth, f.dAvg, f.swirlPhase);
+      ctx.fill();
+    }
+  }
+
+  function drawSparkles() {
+    for (const s of sparkles) {
+      ctx.save();
+      ctx.globalAlpha = clamp(s.life, 0, 1);
+      ctx.fillStyle = "#fff8ec";
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, TWO_PI);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function drawPlate() {
+    ctx.save();
+    ctx.globalAlpha = 0.35;
+    ctx.beginPath();
+    ctx.ellipse(originX, tipY + 10, baseR * 1.5, baseR * 0.32, 0, 0, TWO_PI);
+    ctx.fillStyle = "#c98a4a";
+    ctx.filter = "blur(6px)";
+    ctx.fill();
+    ctx.restore();
+  }
+
+  let lastFrameTime = performance.now();
+  function frame(now) {
+    const dt = Math.min(4, (now - lastFrameTime) / 16.67);
+    lastFrameTime = now;
+
+    if (pointerMode !== "rotate") {
+      if (Math.abs(angularVelocity) > 0.0005) {
+        viewAngle += angularVelocity * dt;
+        angularVelocity *= Math.pow(0.92, dt);
+      } else {
+        angularVelocity = 0;
+      }
+    }
+
+    updateSparkles(dt);
+
+    ctx.clearRect(0, 0, W, H);
+    layout();
+    drawPlate();
+    drawCone();
+    drawScoop();
+    drawSparkles();
+
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- Init ----------
+  resize();
+  layout();
+  resetIceCream();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
