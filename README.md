@@ -10,6 +10,9 @@ Located at `/kensington` - A data dashboard displaying various datasets for the 
 ### Swadesh Word Image Generator
 Located at `/swadesh` - An interactive app that generates AI images from randomly combined words using OpenAI's DALL-E.
 
+### Lick the Cone
+Located at `/icecream` - A canvas-based ice cream cone simulation. Drag across the scoop to lick it (drag length and speed set the strength of the lick, carving a dent and shrinking the scoop), with a synthesized slurp sound on each lick. Drag elsewhere (or use the rotate buttons) to spin the cone and see how the licked side looks from other angles. Pure client-side HTML/CSS/JS, no build step or API required.
+
 ## Setup for Swadesh App
 
 The Swadesh Word Image Generator requires an OpenAI API key to generate images.
