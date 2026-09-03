@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Explore the configuration space of debut novelists listed for the PEN/Hemingway Award and the Center for Fiction First Novel Prize, 2021-2025.">
+<title>Debut Prize Configurator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#E9EBF0; --surface:#FBFCFD; --surface2:#F2F4F8;
+  --ink:#14161D; --ink2:#3B4152; --muted:#606779; --faint:#8F96A6;
+  --rule:#C7CCD8; --hair:#DDE1E9;
+  --occ:#2E4EA7; --occ-soft:rgba(46,78,167,.10); --occ-mid:rgba(46,78,167,.22);
+  --brass:#9A6B10; --brass-soft:rgba(154,107,16,.10);
+  --void:#A6274F; --void-soft:rgba(166,39,79,.09);
+  --shadow:0 1px 2px rgba(20,22,29,.05), 0 10px 30px -20px rgba(20,22,29,.4);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1015; --surface:#161921; --surface2:#1C2029;
+    --ink:#E8EAF0; --ink2:#C2C7D4; --muted:#9AA1B1; --faint:#6E7688;
+    --rule:#2E3440; --hair:#242A34;
+    --occ:#6A8BE0; --occ-soft:rgba(106,139,224,.14); --occ-mid:rgba(106,139,224,.28);
+    --brass:#B0871F; --brass-soft:rgba(176,135,31,.14);
+    --void:#D0576F; --void-soft:rgba(208,87,111,.14);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 34px -20px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1015; --surface:#161921; --surface2:#1C2029;
+  --ink:#E8EAF0; --ink2:#C2C7D4; --muted:#9AA1B1; --faint:#6E7688;
+  --rule:#2E3440; --hair:#242A34;
+  --occ:#6A8BE0; --occ-soft:rgba(106,139,224,.14); --occ-mid:rgba(106,139,224,.28);
+  --brass:#B0871F; --brass-soft:rgba(176,135,31,.14);
+  --void:#D0576F; --void-soft:rgba(208,87,111,.14);
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 12px 34px -20px rgba(0,0,0,.9);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  font-size:15px; line-height:1.6; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:0 22px 80px}
+
+/* header */
+header{border-bottom:1px solid var(--rule); padding:clamp(34px,5vw,62px) 0 26px; margin-bottom:30px}
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted); margin:0 0 14px}
+h1{font-family:Literata,Georgia,serif; font-weight:700; font-size:clamp(31px,5vw,50px);
+  line-height:1.05; letter-spacing:-.022em; margin:0 0 16px; text-wrap:balance; max-width:18ch}
+.dek{font-family:Literata,Georgia,serif; font-size:clamp(16px,1.6vw,18px); line-height:1.6;
+  color:var(--ink2); max-width:64ch; margin:0}
+.dek + .dek{margin-top:.8em}
+
+/* layout */
+.cols{display:grid; grid-template-columns:minmax(0,1fr); gap:26px}
+@media (min-width:1000px){ .cols{grid-template-columns:minmax(0,430px) minmax(0,1fr); gap:34px; align-items:start} }
+
+.card{background:var(--surface); border:1px solid var(--rule); border-radius:5px; box-shadow:var(--shadow)}
+.card + .card{margin-top:20px}
+.card-head{padding:16px 20px 13px; border-bottom:1px solid var(--hair)}
+.card-head h2{font-family:Literata,Georgia,serif; font-size:19px; font-weight:700; margin:0 0 2px; letter-spacing:-.01em}
+.card-head p{margin:0; font-size:12.5px; color:var(--muted); line-height:1.5}
+.card-body{padding:18px 20px 20px}
+
+/* chip groups */
+fieldset{border:0; margin:0 0 20px; padding:0}
+fieldset:last-child{margin-bottom:0}
+legend{padding:0; font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--muted); font-weight:500; margin-bottom:9px}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{position:relative}
+.chip input{position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer}
+.chip > input + span{
+  display:block; padding:6px 12px; border:1px solid var(--rule); border-radius:100px;
+  font-size:13px; color:var(--ink2); background:var(--surface); cursor:pointer;
+  transition:background .12s, border-color .12s, color .12s; white-space:nowrap;
+}
+.chip input:hover + span{border-color:var(--occ); color:var(--ink)}
+.chip input:focus-visible + span{outline:2px solid var(--occ); outline-offset:2px}
+.chip input:checked + span{background:var(--occ); border-color:var(--occ); color:#fff; font-weight:500}
+.g-choice .chip input:checked + span{background:var(--brass); border-color:var(--brass)}
+.chipcount{display:inline; padding:0; border:0; background:none; border-radius:0;
+  font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:400; opacity:.62; margin-left:6px}
+
+.toolbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:4px}
+button.ghost{
+  font-family:"IBM Plex Sans",sans-serif; font-size:12.5px; color:var(--ink2);
+  background:var(--surface2); border:1px solid var(--rule); border-radius:4px;
+  padding:6px 12px; cursor:pointer; transition:border-color .12s, color .12s;
+}
+button.ghost:hover{border-color:var(--occ); color:var(--ink)}
+button.ghost:focus-visible{outline:2px solid var(--occ); outline-offset:2px}
+.status{font-size:12.5px; color:var(--muted)}
+
+/* result */
+#result{min-height:200px}
+.progress{
+  display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+  padding:14px 20px; border-bottom:1px solid var(--hair); background:var(--surface2);
+  border-radius:5px 5px 0 0;
+}
+.progress b{font-family:"IBM Plex Mono",monospace; font-size:22px; font-weight:500;
+  font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+.progress span{font-size:13px; color:var(--muted)}
+.cfgline{
+  font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--muted);
+  padding:11px 20px; border-bottom:1px solid var(--hair); line-height:1.7; word-break:break-word;
+}
+.cfgline em{font-style:normal; color:var(--ink2)}
+.cfgline .pick{color:var(--brass)}
+.cfgline .unset{color:var(--faint); border-bottom:1px dotted var(--faint)}
+
+.verdict{padding:22px 20px 6px}
+.verdict h3{font-family:Literata,Georgia,serif; font-size:21px; font-weight:700; margin:0 0 8px;
+  letter-spacing:-.012em; text-wrap:balance}
+.verdict p{margin:0 0 1em; font-size:14.5px; color:var(--ink2); max-width:62ch}
+.hit h3{color:var(--occ)}
+.miss{border-left:3px solid var(--void); background:var(--void-soft); margin:20px; padding:18px 20px;
+  border-radius:0 4px 4px 0}
+.miss h3{color:var(--void); margin-bottom:10px}
+.miss p{font-family:Literata,Georgia,serif; font-size:15px; line-height:1.65; color:var(--ink2)}
+.miss p:last-child{margin-bottom:0}
+
+.matchlist{display:grid; gap:1px; background:var(--rule); border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule); margin:16px 0 0}
+.match{background:var(--surface); padding:16px 20px}
+.match .who{display:flex; gap:10px; align-items:baseline; flex-wrap:wrap}
+.match .name{font-family:Literata,Georgia,serif; font-size:18px; font-weight:700; letter-spacing:-.012em}
+.match .book{font-family:Literata,Georgia,serif; font-style:italic; font-size:15px; color:var(--ink2)}
+.badge{
+  font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.05em; text-transform:uppercase;
+  padding:2px 7px; border-radius:3px; background:var(--occ-soft); color:var(--occ); white-space:nowrap;
+}
+.badge.win{background:var(--brass-soft); color:var(--brass)}
+.badge.maybe{background:var(--void-soft); color:var(--void)}
+.match .meta{font-size:12.5px; color:var(--muted); margin-top:6px}
+.match .note{font-size:13px; color:var(--ink2); margin-top:9px; line-height:1.55;
+  padding-left:12px; border-left:2px solid var(--hair)}
+.match a{color:var(--occ); font-size:12.5px; word-break:break-all}
+
+/* one-step-away */
+.away{padding:20px}
+.away h4{font-family:"IBM Plex Sans",sans-serif; font-size:12.5px; font-weight:600; margin:0 0 4px}
+.away .sub{font-size:12.5px; color:var(--muted); margin:0 0 14px; max-width:64ch; line-height:1.5}
+.alts{display:grid; gap:14px}
+.altgroup .altlab{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:7px}
+.altrow{display:flex; flex-wrap:wrap; gap:6px}
+.alt{
+  font-family:"IBM Plex Sans",sans-serif; font-size:12.5px; padding:5px 10px; border-radius:4px;
+  border:1px solid var(--rule); background:var(--surface); color:var(--ink2); cursor:pointer;
+  display:inline-flex; gap:7px; align-items:center;
+}
+.alt:hover{border-color:var(--brass); color:var(--ink)}
+.alt:focus-visible{outline:2px solid var(--brass); outline-offset:2px}
+.alt b{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--occ); font-weight:600}
+.alt.zero{opacity:.5; cursor:default}
+.alt.zero b{color:var(--faint)}
+.alt.zero:hover{border-color:var(--rule); color:var(--ink2)}
+
+.shares{padding:0 20px 20px}
+.shares table{width:100%; border-collapse:collapse; font-size:13px}
+.shares th{text-align:left; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); font-weight:600; padding:0 8px 7px 0; border-bottom:1px solid var(--rule)}
+.shares td{padding:7px 8px 7px 0; border-bottom:1px solid var(--hair); vertical-align:middle}
+.shares td.n{text-align:right; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+  color:var(--muted); white-space:nowrap; padding-right:0}
+.shares .bar{height:6px; background:var(--occ-soft); border-radius:0 3px 3px 0; position:relative; min-width:1px}
+.shares .bar i{display:block; height:6px; background:var(--occ); border-radius:0 3px 3px 0}
+.shares tr:last-child td{border-bottom:none}
+
+footer{border-top:1px solid var(--rule); margin-top:44px; padding-top:20px;
+  font-size:12.5px; color:var(--muted); line-height:1.65; max-width:80ch}
+footer a{color:var(--occ)}
+.hidden{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <p class="eyebrow">PEN/Hemingway Award for Debut Novel · Center for Fiction First Novel Prize · 2021–2025</p>
+  <h1>Debut Prize Configurator</h1>
+  <p class="dek">Every author longlisted, shortlisted, named a finalist or awarded by these two prizes between 2021 and 2025 — 144 in all — has been coded on six parameters. Four describe who the author is; two describe the path their book took to print.</p>
+  <p class="dek">Set the first four to your own situation. Set the last two to what you imagine for your own first novel. The tool tells you whether anyone with that exact configuration has appeared on these lists.</p>
+</header>
+
+<div class="cols">
+  <div>
+    <div class="card">
+      <div class="card-head">
+        <h2>Your situation</h2>
+        <p>The four parameters you are not choosing.</p>
+      </div>
+      <div class="card-body" id="panel-you"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>What you're imagining</h2>
+        <p>The two parameters that are still open to you.</p>
+      </div>
+      <div class="card-body g-choice" id="panel-choice"></div>
+    </div>
+
+    <div class="toolbar" style="margin-top:16px">
+      <button class="ghost" type="button" id="reset">Clear all</button>
+      <button class="ghost" type="button" id="rand">Random configuration</button>
+      <button class="ghost" type="button" id="share">Copy link to this configuration</button>
+      <span class="status" id="sharemsg" aria-live="polite"></span>
+    </div>
+  </div>
+
+  <div>
+    <div class="card" id="result">
+      <div class="progress">
+        <b id="count">144</b>
+        <span id="countlabel">authors match — choose a value in each of the six groups</span>
+      </div>
+      <div class="cfgline" id="cfgline"></div>
+      <div id="verdict"></div>
+      <div id="away"></div>
+      <div class="shares" id="shares"></div>
+    </div>
+  </div>
+</div>
+
+<footer id="foot"></footer>
+</div>
+
+<script>
+const AUTHORS = [{"p1":"Man","p2":"Pacific Islander / Native Hawaiian","p3":"Other graduate degree","p4":"Big Five","p5":"First book","p6":"Speculative","a":"Kawai Strong Washburn","t":"Sharks in the Time of Saviors","w":"PEN/Hemingway","y":2021,"s":"Winner","n":"Born/raised Hamakua coast, Big Island. MPA-track grad student at Columbia; took fiction workshop, no MFA. FSG/MCD = Macmillan.","u":"https://us.macmillan.com/author/kawaistrongwashburn"},{"p1":"Woman","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Historical","a":"Maisy Card","t":"These Ghosts Are Family","w":"PEN/Hemingway","y":2021,"s":"Finalist","n":"Born St. Catherine, Jamaica; raised Queens. Also holds MLIS (Rutgers). Public librarian.","u":"https://www.simonandschuster.com/authors/Maisy-Card/155564110"},{"p1":"Woman","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Raven Leilani","t":"Luster","w":"PEN/Hemingway","y":2021,"s":"Finalist","n":"Axinn Foundation Writer-in-Residence. FSG = Macmillan.","u":"https://www.swansea.ac.uk/dylan-thomas-prize/previous-winners/2021-raven-leilani-luster/"},{"p1":"Man","p2":"White","p3":"Other graduate degree","p4":"Large independent","p5":"First book","p6":"Literary realism","a":"Douglas Stuart","t":"Shuggie Bain","w":"PEN/Hemingway","y":2021,"s":"Finalist","n":"Scottish-American. MA Royal College of Art (design, not writing); fashion designer. Grove Atlantic = large indep.","u":"https://www.loc.gov/item/n2019051092/douglas-stuart/"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Historical","a":"C Pam Zhang","t":"How Much of These Hills Is Gold","w":"PEN/Hemingway","y":2021,"s":"Finalist","n":"Born Beijing 1990; to US at age 4. Brown BA, Cambridge MFA. Riverhead = PRH.","u":"https://literaturfestival.com/en/authors/zhang/"},{"p1":"Woman","p2":"Latino/a/x","p3":"(not found)","p4":"Large independent","p5":"Prior book, other form","p6":"Literary realism","a":"Kirstin Valdez Quade","t":"The Five Wounds","w":"Center for Fiction","y":2021,"s":"Winner","n":"Credential not established: no bio names a degree; Stegner is a post-grad fellowship, not a credential. Prior: Night at the Fiestas (Norton, 2015). Also PEN/Hem 2022 finalist.","u":"https://kirstinvaldezquade.com/bio/"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"First book","p6":"Speculative","a":"Priyanka Champaneri","t":"The City of Good Death","w":"Center for Fiction","y":2021,"s":"Shortlist","n":"Won 2018 Restless Books Prize for New Immigrant Writing. Publisher classifies as ghost story.","u":"https://restlessbooks.org/priyanka-champaneri"},{"p1":"Woman","p2":"Asian American","p3":"Other graduate degree","p4":"Big Five","p5":"Prior book, other form","p6":"Historical","a":"Linda Rui Feng","t":"Swimming Back to Trout River","w":"Center for Fiction","y":2021,"s":"Shortlist","n":"Born Shanghai. Harvard + Columbia; professor of Chinese cultural history, U Toronto. Prior: City of Marvel and Transformation (2015).","u":"https://www.simonandschuster.com/authors/Linda-Rui-Feng/161224833"},{"p1":"Woman","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Historical","a":"Honoree Fanonne Jeffers","t":"The Love Songs of W.E.B. Du Bois","w":"Center for Fiction","y":2021,"s":"Shortlist","n":"Credential inferred: Wikipedia lists Talladega College + U Alabama without naming the degree. Teaches creative writing at U Oklahoma. Five prior poetry collections. Also PEN/Hem 2022 finalist.","u":"https://readinggroupchoices.com/books/love-songs-of-w-e-b-du-bois/"},{"p1":"Woman","p2":"Multiracial / other","p3":"No graduate degree","p4":"Big Five","p5":"Prior book, other form","p6":"Speculative","a":"Violet Kupersmith","t":"Build Your House Around My Body","w":"Center for Fiction","y":2021,"s":"Shortlist","n":"Race/ethnicity inferred: no self-description; Vietnamese folk tales from her grandmother. Credential inferred: East Anglia post was the David T.K. Wong Fellowship, not a degree. Prior: The Frangipani Hotel (2014).","u":"http://www.violetkupersmith.com/"},{"p1":"Woman","p2":"White","p3":"No graduate degree","p4":"Big Five","p5":"Prior book, other form","p6":"Autofiction / hybrid","a":"Patricia Lockwood","t":"No One Is Talking About This","w":"Center for Fiction","y":2021,"s":"Shortlist","n":"Did not attend college. Prior: Priestdaddy (memoir), two poetry collections. Riverhead = PRH.","u":"https://www.penguinrandomhouse.com/authors/242105/patricia-lockwood/"},{"p1":"Man","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Literary realism","a":"Nawaaz Ahmed","t":"Radiant Fugitives","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Born Tamil Nadu, India. Former computer scientist at Yahoo. Kundiman + Lambda Fellow.","u":"https://www.counterpointpress.com/books/radiant-fugitives/"},{"p1":"Man","p2":"Black","p3":"No graduate degree","p4":"Large independent","p5":"First book","p6":"Literary realism","a":"Mateo Askaripour","t":"Black Buck","w":"Center for Fiction","y":2021,"s":"Longlist","n":"P3 INFERRED from 'no formal training in writing.' Former tech-startup sales director. HMH was independent at publication (trade division sold to HarperCollins later in 2021).","u":"https://www.cbsnews.com/news/book-excerpt-black-buck-by-mateo-askaripour/"},{"p1":"Woman","p2":"White","p3":"Other graduate degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Ilona Bannister","t":"When I Ran Away","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Race/ethnicity inferred: no ethnic self-description in any bio. Dual-qualified US attorney / UK solicitor; practiced immigration law. Doubleday = PRH.","u":"https://www.barnesandnoble.com/w/when-i-ran-away-ilona-bannister/1137365021"},{"p1":"Woman","p2":"Latino/a/x","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Speculative","a":"Jamie Figueroa","t":"Brother, Sister, Mother, Explorer","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Self-describes as Boricua (Afro-Taino) by way of Ohio -- value strains the single-cell rule, spans Latina and Black. Faculty, IAIA MFA program.","u":"https://jamiefigueroa.com/bio/"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"First book","p6":"Literary realism","a":"Heather Frese","t":"The Baddest Girl on the Planet","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Also MA, Ohio University. Won the Lee Smith Novel Prize (Blair's route to publication).","u":"https://heatherfrese.com/about/"},{"p1":"Woman","p2":"White","p3":"(not found)","p4":"Small press / nonprofit","p5":"First book","p6":"Literary realism","a":"Rebecca Handler","t":"Edie Richter Is Not Alone","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Credential not established: no education stated in any bio -- the full bio is one sentence.","u":"https://www.unnamedpress.com/all-books/p/edie-richter-hardcover"},{"p1":"Man","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Historical","a":"Nathan Harris","t":"The Sweetness of Water","w":"Center for Fiction","y":2021,"s":"Longlist","n":"P2 evidenced indirectly: won the Ernest J. Gaines Award, restricted to African American fiction writers. Little, Brown = Hachette.","u":"https://www.nathanharrisauthor.com/bio"},{"p1":"Man","p2":"White","p3":"Other graduate degree","p4":"Large independent","p5":"First book","p6":"Crime / thriller","a":"Erik Hoel","t":"The Revelations","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. PhD neuroscience (Wisconsin-Madison); research asst professor, Tufts. Center for Fiction Emerging Writer Fellow.","u":"https://www.abramsbooks.com/product/revelations_9781419750229/"},{"p1":"Man","p2":"White","p3":"(not found)","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Ethan Joella","t":"A Little Hope","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Credential not established: teaches English and psychology at U Delaware but no degree named in any bio. Scribner = S&S.","u":"https://www.simonandschuster.com/authors/Ethan-Joella/178936526"},{"p1":"Man","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Historical","a":"Robert Jones Jr.","t":"The Prophets","w":"Center for Fiction","y":2021,"s":"Longlist","n":"BFA creative writing + MFA fiction, Brooklyn College. Creator of Son of Baldwin. Putnam = PRH.","u":"https://pen.org/the-pen-ten-robert-jones-jr/"},{"p1":"Man","p2":"Latino/a/x","p3":"(not found)","p4":"Big Five","p5":"First book","p6":"Historical","a":"Daniel Loedel","t":"Hades, Argentina","w":"Center for Fiction","y":2021,"s":"Longlist","n":"P2 INFERRED from Argentine family history: book inspired by his half-sister's 1978 disappearance in Argentina. Credential not established: book editor; no degree stated. Riverhead = PRH.","u":"https://global.penguinrandomhouse.com/announcements/daniel-loedel-to-celebrate-his-debut-novel-hades-argentina-via-zoom-2-23/"},{"p1":"Woman","p2":"(not found)","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Speculative","a":"Faith Merino","t":"Cormorant Lake","w":"Center for Fiction","y":2021,"s":"Longlist","n":"P2 LEFT BLANK, not inferred: surname is a contrary indicator to a default-white reading and no self-description exists. Former Stegner Fellow; teaches at Folsom Lake College.","u":"https://www.barnesandnoble.com/w/cormorant-lake-faith-merino/1137516813"},{"p1":"Man","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Historical","a":"Nathaniel Ian Miller","t":"The Memoirs of Stockholm Sven","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. MFA + MS Environmental Studies, U Montana. Former journalist; beef farmer in Vermont.","u":"https://www.hachettebookgroup.com/titles/nathaniel-ian-miller/the-memoirs-of-stockholm-sven/9780316592567/?lens=little-brown"},{"p1":"Nonbinary","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Crime / thriller","a":"A. E. Osworth","t":"We Are Watching Eliza Bright","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Self-described queer, trans and nonbinary; they/them. Race/ethnicity inferred: no ethnic self-description. Book began as an MFA seminar assignment at The New School. Grand Central = Hachette.","u":"https://www.hachettebookgroup.com/titles/a-e-osworth/we-are-watching-eliza-bright/9781538717622/?lens=grand-central-publishing"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Kirthana Ramisetti","t":"Dava Shastri's Last Day","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Variety describes her as Indian American, raised in Southern California; MFA Emerson 2003. Former entertainment reporter, Newsday and NY Daily News.","u":"https://variety.com/2021/tv/news/dava-shastris-last-day-kirthana-ramisetti-veritas-1235050167/"},{"p1":"Nonbinary","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Rebecca (Bee) Sacks","t":"City of a Thousand Gates","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Gender flagged: published in 2021 as Rebecca Sacks with she/her; current bios use they/she and the name Bee. Field records current identification. Race/ethnicity inferred: Jewish American (studied Jewish Studies in Tel Aviv, MA); no racial self-description. Former Vanity Fair journalist.","u":"https://www.humanities.uci.edu/events/rebecca-sacks-lover-book-talk-0"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Speculative","a":"Sanjena Sathian","t":"Gold Diggers","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Raised in Georgia by a Malayali father and Kannadiga mother, both immigrants from South India. Iowa Writers' Workshop MFA 2019. Former tech journalist / Mumbai correspondent. Penguin Press = PRH.","u":"https://en.wikipedia.org/wiki/Sanjena_Sathian"},{"p1":"Woman","p2":"Asian American","p3":"(not found)","p4":"Large independent","p5":"Prior book, other form","p6":"Historical","a":"Shruti Swamy","t":"The Archer","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Race/ethnicity inferred: Kundiman Fiction Fellow (fellowship for Asian American writers); no direct self-description found. Credential not established: no source clearly states a degree. Prior: A House Is a Body (2020). Algonquin = large indep.","u":"https://www.hachettebookgroup.com/contributor/shruti-swamy/"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Stacey Swann","t":"Olympus, Texas","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Stegner Fellow. Contributing editor, American Short Fiction. Doubleday = PRH.","u":"https://www.staceyswann.com/bio"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Literary realism","a":"Lisa Taddeo","t":"Animal","w":"Center for Fiction","y":2021,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. BU Creative Writing 'Fiction '17'. Prior: Three Women (Avid Reader, 2019), nonfiction. Avid Reader = S&S.","u":"https://www.simonandschuster.com/books/Animal/Lisa-Taddeo/9781982122133"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Literary realism","a":"Torrey Peters","t":"Detransition, Baby","w":"PEN/Hemingway","y":2022,"s":"Winner","n":"Trans woman. MFA Iowa + MA comparative literature, Dartmouth. Race/ethnicity inferred: no ethnic self-description. P5: prior novellas were self-published before Random House reissued them. One World = PRH.","u":"https://www.penguinrandomhouse.com/authors/2202823/torrey-peters/"},{"p1":"Woman","p2":"Asian American","p3":"Other graduate degree","p4":"Large independent","p5":"First book","p6":"Literary realism","a":"Avni Doshi","t":"Burnt Sugar","w":"PEN/Hemingway","y":2022,"s":"Finalist","n":"Born New Jersey 1982 to Indian immigrant parents. BA art history Barnard, MA history of art UCL. Former art curator in India. Overlook is an Abrams imprint.","u":"https://www.abramsbooks.com/contributor/avni-doshi_30909143/"},{"p1":"Woman","p2":"Black","p3":"(not found)","p4":"Big Five","p5":"Prior book, other form","p6":"Autofiction / hybrid","a":"Carolyn Ferrell","t":"Dear Miss Metropolitan","w":"PEN/Hemingway","y":2022,"s":"Finalist","n":"P2 INFERRED and WEAK: publication in Callaloo and subject matter only; no self-description found. Credential not established: teaches writing at Sarah Lawrence but no bio names her own degree. Prior: Don't Erase Me (1997). Holt = Macmillan. Mode: fragments + photographs.","u":"https://www.sarahlawrence.edu/faculty/ferrell-carolyn.html"},{"p1":"Woman","p2":"MENA","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"Prior book, other form","p6":"Autofiction / hybrid","a":"Noor Naga","t":"If an Egyptian Cannot Speak English","w":"Center for Fiction","y":2022,"s":"Winner","n":"Egyptian-Canadian, born Philadelphia, raised Dubai, teaches at American University in Cairo. Reached publication via the Graywolf Press Africa Prize rather than an agent -- a distinct pathway. Prior: Washes, Prays (2020).","u":"https://www.graywolfpress.org/books/if-egyptian-cannot-speak-english"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Autofiction / hybrid","a":"Daphne Palasi Andreades","t":"Brown Girls","w":"Center for Fiction","y":2022,"s":"Shortlist","n":"Filipino American; parents immigrated from the Philippines in the 1990s. Born/raised Queens. Uses she/they. Novel in vignettes narrated in the choral first-person plural.","u":"https://lithub.com/brown-girls/"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Speculative","a":"Jessamine Chan","t":"The School for Good Mothers","w":"Center for Fiction","y":2022,"s":"Shortlist","n":"Race/ethnicity inferred: no self-description; protagonist is Chinese American and coverage describes Chan as such. Former reviews editor at Publishers Weekly. Dystopian premise.","u":"https://www.simonandschuster.com/authors/Jessamine-Chan/173006598"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Literary realism","a":"Isabel Kaplan","t":"NSFW","w":"Center for Fiction","y":2022,"s":"Shortlist","n":"Race/ethnicity inferred: no self-description. Published YA novel Hancock Park (2009) while a Harvard undergrad, so this is an adult debut, not a first book. Holt = Macmillan.","u":"https://www.isabelkaplan.com/about"},{"p1":"Woman","p2":"Asian American","p3":"(not found)","p4":"Large independent","p5":"First book","p6":"Literary realism","a":"Alyssa Songsiridej","t":"Little Rabbit","w":"Center for Fiction","y":2022,"s":"Shortlist","n":"P2 INFERRED FROM SURNAME ONLY -- thin. Credential not established: a Broad Street Review mention of an MFA refers to the novel's narrator, not the author. Editor at Electric Literature. Also PEN/Hemingway 2023 finalist.","u":"https://alyssasongsiridej.com/bio/"},{"p1":"Woman","p2":"Black","p3":"MFA / CW grad degree","p4":"Large independent","p5":"Prior book, other form","p6":"Literary realism","a":"Mecca Jamilah Sullivan","t":"Big Girl","w":"Center for Fiction","y":2022,"s":"Shortlist","n":"PhD English (Penn), MA English & Creative Writing (Temple), BA Afro-American Studies (Smith). The Temple MA is a CW degree, so P3 counts as a CW credential. Liveright = Norton.","u":"http://www.meccajamilahsullivan.com/bios"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Speculative","a":"Vauhini Vara","t":"The Immortal King Rao","w":"Center for Fiction","y":2022,"s":"Shortlist","n":"Self-describes Dalit background -- unusually specific for P2. Born Canada to Indian immigrants. Former WSJ tech reporter and New Yorker business editor. Pulitzer finalist.","u":"https://www.pulitzer.org/finalists/vauhini-vara"},{"p1":"Nonbinary","p2":"Asian American","p3":"(not found)","p4":"Big Five","p5":"Prior book, other form","p6":"Autofiction / hybrid","a":"Fatimah Asghar","t":"When We Were Sisters","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Self-describes as South-Asian American Muslim; uses they/them, though some outlets use she. Credential not established: no degree in any bio. Prior: If They Come For Us (2018). One World = PRH.","u":"https://blueflowerarts.com/artist/fatimah-asghar/"},{"p1":"Woman","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Literary realism","a":"Destiny O. Birdsong","t":"Nobody's Magic","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Self-described African American. MFA poetry + PhD English, Vanderbilt; BA Fisk. Prior: Negotiations (Tin House, 2020). Grand Central = Hachette. Triptych of novellas.","u":"https://www.poetryfoundation.org/poets/destiny-o-birdsong"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Large independent","p5":"Prior book, other form","p6":"Autofiction / hybrid","a":"Lisa Hsiao Chen","t":"Activities of Daily Living","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Born Taipei. Prior: Mouth (Kaya Press, 2007). Wikipedia classifies the novel as autofiction. Also PEN/Hemingway 2023 finalist -- fourth author appearing in both awards.","u":"https://www.lisahchen.com/bio"},{"p1":"Man","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Blair Fell","t":"The Sign for Home","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. ASL interpreter since 1993; playwright and TV writer (Queer as Folk). Plays/TV don't count as a prior book. Atria = S&S.","u":"https://www.amazon.com/Sign-Home-Novel-Blair-Fell/dp/1982175966"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Crime / thriller","a":"Caroline Frost","t":"Shadows of Pecan Hollow","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. USC Master of Professional Writing is a creative-writing degree. Licensed Marriage and Family Therapist. Won the Crook's Corner Prize. William Morrow = HarperCollins.","u":"https://www.amazon.com/Shadows-Pecan-Hollow-Caroline-Frost/dp/0063211378"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Autofiction / hybrid","a":"Meghan Gilliss","t":"Lungfish","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. P6 BORDERLINE: realist content, fragmentary form; Kirkus notes passages reading like poetry or lyric essay. Worked as journalist, bookseller, librarian, hospital worker.","u":"https://books.catapult.co/books/lungfish/"},{"p1":"Woman","p2":"Black","p3":"No graduate degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Kai Harris","t":"What the Fireflies Knew","w":"Center for Fiction","y":2022,"s":"Longlist","n":"P2 INFERRED from Phillis Wheatley Book Award and NAACP Image Award nomination, not self-description. PhD Western Michigan with Gwen Frostic Creative Writing Award; now Asst Prof of Creative Writing, Santa Clara. Tiny Reparations is a Dutton/PRH imprint.","u":"https://www.amazon.com/What-Fireflies-Knew-Kai-Harris/dp/059318534X"},{"p1":"Woman","p2":"Multiracial / other","p3":"Other graduate degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Chantal V. Johnson","t":"Post-traumatic","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Race/ethnicity inferred (weakly): sources describe the PROTAGONIST as Black Latina; Johnson's own identity not separately stated in sources found. Stanford JD '14; tenant lawyer 7+ years; wrote the novel while working full time. Little, Brown = Hachette.","u":"https://lithub.com/chantal-v-johnson-on-letting-the-reader-be-smarter-than-her-character/"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Historical","a":"Leyna Krow","t":"Fire Season","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Prior: I'm Fine, But You Appear to Be Sinking (2017), a Believer Book Award finalist. Historical with magical-realist elements. Viking = PRH.","u":"https://www.ewu.edu/cahss/stories/fire-season-leyna-krow/"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Historical","a":"Tsering Yangzom Lama","t":"We Measure the Earth with Our Bodies","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Nationality edge case: Tibetan, born and raised in a refugee community in Nepal, based in Vancouver. Retained per Step 1 decision. MFA Columbia; BA creative writing + international relations, UBC.","u":"https://tseringlama.com/"},{"p1":"Woman","p2":"Asian American","p3":"Other graduate degree","p4":"Big Five","p5":"First book","p6":"Crime / thriller","a":"Grace D. Li","t":"Portrait of a Thief","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Chinese American, grew up Pearland TX. Duke BA (biology major, creative writing minor), Stanford School of Medicine. Wrote the book as a med student on a Stanford-funded writing year. Tiny Reparations = Dutton/PRH. Art-heist plot.","u":"https://www.gracedli.com/about"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Speculative","a":"Emme Lund","t":"The Boy with a Bird in His Chest","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Trans woman. Race/ethnicity inferred: no self-description. P5 MARGINAL: The Sacred Text of Rosa Who Is Great (Quiet Lightning, 2016) was a limited-run collaborative art book. Novel began as her MFA thesis. Atria = S&S.","u":"https://emmelund.net/about-the-author/"},{"p1":"Woman","p2":"Black","p3":"No graduate degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Leila Mottley","t":"Nightcrawling","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Wikipedia states plainly that she is Black. Oakland Youth Poet Laureate at 16; began the novel at 17, published before 20; on indefinite leave from Smith. Poetry collection came AFTER the novel, so P5 is first book. Only author so far with neither a grad degree nor a prior book. Knopf = PRH.","u":"https://en.wikipedia.org/wiki/Leila_Mottley"},{"p1":"Nonbinary","p2":"Black","p3":"(not found)","p4":"Big Five","p5":"First book","p6":"Speculative","a":"Eloghosa Osunde","t":"Vagabonds!","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Nigerian writer and multidisciplinary artist. P1: current bios use they/them; earlier publisher copy used she -- flagged. Credential not established: workshops (Farafina, Caine Prize) and NY Film Academy programs, but no writing degree. Riverhead = PRH. Magical realism set in Lagos.","u":"https://www.eloghosaosunde.com/about"},{"p1":"Woman","p2":"Asian American","p3":"(not found)","p4":"Large independent","p5":"First book","p6":"Literary realism","a":"Namrata Patel","t":"The Candid Life of Meena Dave","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Self-described Indian American. Credential not established: taught at Emerson and Boston College but no degree named in any bio. Lake Union is Amazon Publishing's literary imprint -- coded large independent; see Notes on P4 limits.","u":"https://www.nampatel.com/"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"First book","p6":"Autofiction / hybrid","a":"Namrata Poddar","t":"Border Less","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Self-described South Asian American, first-generation, raised in Mumbai. MFA Bennington + PhD French literature (Penn) + Mellon postdoc. Teaches at UCLA. 7.13 Books is a small independent press. Novel-in-stories form.","u":"http://www.namratapoddar.com/"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Historical","a":"Belinda Huijuan Tang","t":"A Map for the Missing","w":"Center for Fiction","y":2022,"s":"Longlist","n":"Race/ethnicity inferred: Chinese American; father grew up in rural China, she studied at Peking University; no direct self-description. Iowa Writers' Workshop 2021, Truman Capote Fellow. Penguin Press = PRH. Set in post-Cultural Revolution China.","u":"https://www.belindahuijuantang.com/about"},{"p1":"Man","p2":"Indigenous (Native American)","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Literary realism","a":"Oscar Hokeah","t":"Calling for a Blanket Dance","w":"PEN/Hemingway","y":2023,"s":"Winner","n":"Self-described: citizen of Cherokee Nation and Kiowa Tribe of Oklahoma via mother, Mexican heritage via father. P2 spans Indigenous and Latino -- coded Indigenous, flagged. BFA creative writing IAIA + MA English/Native American Lit, Oklahoma. Works with Indian Child Welfare in Tahlequah.","u":"https://www.hachettebookgroup.com/titles/oscar-hokeah/calling-for-a-blanket-dance/9781643751474/"},{"p1":"Woman","p2":"Indigenous (Native American)","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Crime / thriller","a":"Ramona Emerson","t":"Shutter","w":"PEN/Hemingway","y":2023,"s":"Finalist","n":"Self-described Dine, from Tohatchi NM. BA Media Arts UNM 1997; MFA Creative Writing (Fiction) IAIA 2015. Filmmaker; former forensic videographer. Wrote first draft as MFA thesis. Soho Crime. Crime + supernatural.","u":"https://sohopress.com/authors/ramona-emerson/"},{"p1":"Man","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Literary realism","a":"Ryan Lee Wong","t":"Which Side Are You On","w":"PEN/Hemingway","y":2023,"s":"Finalist","n":"Self-described: son of a fifth-generation Chinese American father and a Korean immigrant mother. Lived two years at Ancestral Heart Zen Temple; administrative director, Brooklyn Zen Center. Former program director, Asian American Writers' Workshop; managing director, Kundiman.","u":"https://books.catapult.co/bookauthor/ryan-lee-wong/"},{"p1":"Man","p2":"Black","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Speculative","a":"Tyriek White","t":"We Are a Haunting","w":"Center for Fiction","y":2023,"s":"Winner","n":"Race/ethnicity inferred: media director of Lampblack Literary Foundation (mutual aid for Black writers across the diaspora) and Callaloo fellow; no direct self-description. BA Creative Writing & Africana Studies, Pitzer; MFA Mississippi. Magical realism in East New York.","u":"https://tyriekwhite.com/about"},{"p1":"Woman","p2":"Latino/a/x","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Speculative","a":"Elizabeth Acevedo","t":"Family Lore","w":"Center for Fiction","y":2023,"s":"Shortlist","n":"Dominican American, raised Harlem. National Poetry Slam champion; MFA Maryland. ADULT debut, not first book: The Poet X (2018) won the National Book Award for Young People's Literature, plus two more YA bestsellers. Ecco = HarperCollins.","u":"https://www.poetryfoundation.org/poets/elizabeth-acevedo-5aa950f8df1c6"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"Prior book, other form","p6":"Literary realism","a":"Christine Byl","t":"Lookout","w":"Center for Fiction","y":2023,"s":"Shortlist","n":"Race/ethnicity inferred: no self-description. Prior: Dirt Work (Beacon Press, 2013), memoir. Professional trail-builder for 25+ years; lives off-grid near Healy, Alaska. A Strange Object is a Deep Vellum imprint.","u":"https://store.deepvellum.org/products/lookout"},{"p1":"Man","p2":"Black","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"First book","p6":"Speculative","a":"Eskor David Johnson","t":"Pay as You Go","w":"Center for Fiction","y":2023,"s":"Shortlist","n":"Race/ethnicity inferred: from Trinidad and Tobago and the US; no direct racial self-description found. Harvard BA 2011, Iowa MFA 2016 (Richard Yates Prize, Maytag Fellowship). Now Asst Prof of Creative Writing, Stony Brook. Mock-epic set in fictional city.","u":"https://annieblooms.com/book/9781952119743"},{"p1":"Woman","p2":"Black","p3":"(not found)","p4":"Large independent","p5":"First book","p6":"Historical","a":"Jamila Minnicks","t":"Moonrise Over New Jessup","w":"Center for Fiction","y":2023,"s":"Shortlist","n":"Race/ethnicity inferred: Howard University School of Law; won the Black Caucus of the ALA First Novelist Award; no direct self-description. Credential not established: three degrees (Michigan, Howard Law, Georgetown Law), none in writing.","u":"https://www.hachettebookgroup.com/titles/jamila-minnicks/moonrise-over-new-jessup/9781649041319/"},{"p1":"Woman","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Historical","a":"Tracey Rose Peyton","t":"Night Wherever We Go","w":"Center for Fiction","y":2023,"s":"Shortlist","n":"Race/ethnicity inferred: BA Howard University; subject is enslaved women; no direct self-description. MFA Michener Center. Sold to Ecco in a preempt for a healthy six figures. Ecco = HarperCollins.","u":"https://www.traceyrosepeyton.com/about"},{"p1":"Woman","p2":"Asian American","p3":"(not found)","p4":"Large independent","p5":"First book","p6":"Autofiction / hybrid","a":"Esther Yi","t":"Y/N","w":"Center for Fiction","y":2023,"s":"Shortlist","n":"Korean American, based in Berlin. Credential not established: no degree named in any bio. Wikipedia classes the book as absurdist fiction; narrator is an unnamed Korean American writing K-pop fanfiction.","u":"https://en.wikipedia.org/wiki/Y/N"},{"p1":"Man","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Speculative","a":"Nana Kwame Adjei-Brenyah","t":"Chain-Gang All-Stars","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Ghanaian American, raised Spring Valley NY. SUNY Albany BA, Syracuse MFA. Prior: Friday Black (2018), which won the PEN/Jean Stein Award. National Book Award finalist for the novel. Pantheon = PRH.","u":"https://en.wikipedia.org/wiki/Nana_Kwame_Adjei-Brenyah"},{"p1":"Woman","p2":"Asian American","p3":"Other graduate degree","p4":"Big Five","p5":"First book","p6":"Historical","a":"Nigar Alam","t":"Under the Tamarind Tree","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Born Karachi, Pakistan; childhood in Turkey, Nigeria, Italy, Kenya, Indonesia, US. MBA and CPA; worked in brand management and auditing; teaches at Anoka-Ramsey Community College, Minnesota. Putnam = PRH.","u":"https://miamibookfair.com/mbf-author/nigar-alam/"},{"p1":"Woman","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Lakiesha Carr","t":"An Autobiography of Skin","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Race/ethnicity inferred: Kimbilio and Callaloo fellowships, subject is Black women in East Texas; no direct self-description. SMU journalism; Iowa MFA (Maytag Fellowship). Former CNN and NYT editorial/production. Pantheon = PRH.","u":"https://lakieshacarr.com/about"},{"p1":"Woman","p2":"Black","p3":"(not found)","p4":"Small press / nonprofit","p5":"First book","p6":"Speculative","a":"Kashana Cauley","t":"The Survivalists","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Credential not established: former Midtown antitrust lawyer turned TV writer (The Daily Show, The Great North); no writing degree named. Soft Skull is a Counterpoint imprint. Satire about Black doomsday preppers.","u":"https://softskull.com/books/the-survivalists/"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Speculative","a":"Gina Chung","t":"Sea Change","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Self-described Korean American, born Queens to Korean immigrant parents. New School MFA 2021 -- the novel was her thesis. Center for Fiction Emerging Writer Fellow; programs manager at Kundiman; formerly at PEN America. Vintage = PRH.","u":"https://en.wikipedia.org/wiki/Gina_Chung"},{"p1":"Woman","p2":"Black","p3":"MFA / CW grad degree","p4":"Other / new-model imprint","p5":"First book","p6":"Historical","a":"Kim Coleman Foote","t":"Coleman Hill","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Race/ethnicity inferred: Kimbilio fellow, BA Black Studies concentration, subject is African American families; no direct self-description. MFA Chicago State. P4 PROBLEM: SJP Lit is Sarah Jessica Parker's imprint at Zando, an independent founded 2020 -- not Big Five, not a traditional small press.","u":"https://kimfoote.com/about/"},{"p1":"Woman","p2":"Asian American","p3":"Other graduate degree","p4":"Big Five","p5":"First book","p6":"Crime / thriller","a":"Vibhuti Jain","t":"Our Best Intentions","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Indian American, grew up Guilford CT. Yale BA, Harvard Law JD. Former corporate lawyer; works in international development finance in Johannesburg. William Morrow = HarperCollins.","u":"https://www.writersdigest.com/write-better-fiction/vibhuti-jain-on-the-hardest-part-of-writing-a-novel"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"Prior book, other form","p6":"Historical","a":"Mimi Herman","t":"The Kudzu Queen","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. MFA Warren Wilson; BA UNC. Prior: two poetry collections plus The Art of Learning (nonfiction). AWP Board of Directors; Kennedy Center Teaching Artist; 2017 NC Piedmont Laureate.","u":"https://www.mimiherman.com/"},{"p1":"Man","p2":"White","p3":"(not found)","p4":"Small press / nonprofit","p5":"First book","p6":"Autofiction / hybrid","a":"Jeffrey Dale Lofton","t":"Red Clay Suzie","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Credential not established: Master's degrees in Public Administration and Library and Information Science -- neither in writing. Former stage/TV actor; senior advisor at the Library of Congress. Self-describes the book as a fictionalized memoir.","u":"https://jeffreydlofton.com/biography/"},{"p1":"Woman","p2":"White","p3":"Other graduate degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Leigh McMullan Abramson","t":"A Likely Story","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Penn Law JD '06; worked as lawyer and journalist. Daughter of a children's author and an illustrator. Atria = S&S.","u":"https://www.simonandschuster.com/authors/Leigh-McMullan-Abramson/189373348"},{"p1":"Man","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Speculative","a":"John Milas","t":"The Militia House","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Marine Corps, deployed to Helmand Province 2010, discharged 2012. BA creative writing Illinois, MFA fiction Purdue (thesis chair Roxane Gay). Gothic horror set in Afghanistan. Holt = Macmillan.","u":"https://www.johnmilas.com/bio"},{"p1":"Man","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"DK Nnuro","t":"What Napoleon Could Not Do","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Ghanaian-born. Johns Hopkins BA, Iowa Writers' Workshop MFA. Taught novel writing at Iowa; curator of special projects, Stanley Museum of Art. Riverhead = PRH.","u":"https://www.penguinrandomhouse.com/books/678665/what-napoleon-could-not-do-by-dk-nnuro/"},{"p1":"Man","p2":"White","p3":"(not found)","p4":"Big Five","p5":"Prior book, other form","p6":"Crime / thriller","a":"Kevin Sites","t":"The Ocean Above Me","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Credential not established: MS Northwestern (journalism), Nieman Fellow Harvard, Dart Fellow Columbia -- none in creative writing. 30-year war correspondent (ABC, NBC, CNN, Yahoo, Vice). Prior: three nonfiction books on war. Harper = HarperCollins.","u":"https://kevinsiteswrites.com/"},{"p1":"Woman","p2":"Asian American","p3":"Other graduate degree","p4":"Large independent","p5":"First book","p6":"Crime / thriller","a":"Jamie Lee Sogn","t":"Salthouse Place","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Self-described Filipina American, grew up Olympia WA. UW anthropology/psychology; JD University of Oregon. Practicing attorney. Reached publication via Pitch Wars mentorship. Lake Union is Amazon Publishing -- coded large indep; see Legend on P4 limits.","u":"https://www.jamieleesogn.com/"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Thao Thai","t":"Banyan Moon","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Vietnamese American. MFA Ohio State 2012; MA University of Chicago. Read with Jenna pick. Mariner = HarperCollins.","u":"https://thaowrites.com/about"},{"p1":"Man","p2":"Multiracial / other","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Speculative","a":"Anise Vance","t":"Hush Harbor","w":"Center for Fiction","y":2023,"s":"Longlist","n":"Self-described: son of a Black American father and an Iranian American mother; from the African and Iranian diasporas. MFA Rutgers-Camden; MPhil Queen's Belfast as a Mitchell Scholar; Dartmouth BA. Hanover Square = HarperCollins.","u":"https://www.shelf-awareness.com/maxshelf/2023-06-01/anise_vance:_violence_vs._creating_community.html"},{"p1":"Woman","p2":"White","p3":"(not found)","p4":"Big Five","p5":"First book","p6":"Historical","a":"Alice Winn","t":"In Memoriam","w":"Center for Fiction","y":2023,"s":"Longlist","n":"NATIONALITY EDGE CASE, FURTHEST OUT IN THE CORPUS: born and raised in Paris to Irish and American parents, educated at Marlborough College and Oxford, holds Irish citizenship, lives in Brooklyn. In the corpus by construction (CFF longlist). P2 INFERRED.","u":"https://www.alicewinn.com/"},{"p1":"Man","p2":"Latino/a/x","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Javier Fuentes","t":"Countries of Origin","w":"PEN/Hemingway","y":2024,"s":"Winner","n":"Born and raised in Spain; moved to the US at 20. Worked as a pastry chef before writing. MFA Columbia. Pantheon = PRH. Nationality edge case: Spanish-born, US-based.","u":"https://www.penguinrandomhouse.com/authors/2231766/javier-fuentes/"},{"p1":"Man","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Speculative","a":"Jinwoo Chong","t":"Flux","w":"PEN/Hemingway","y":2024,"s":"Finalist","n":"Korean American, raised New Jersey. MFA fiction Columbia. Melville House = large indep. Time-bending corporate sci-fi across three timelines.","u":"https://www.jinwoochong.com/about"},{"p1":"Nonbinary","p2":"White","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"Prior book, other form","p6":"Literary realism","a":"Miah Jeffra","t":"American Gospel","w":"PEN/Hemingway","y":2024,"s":"Finalist","n":"Race/ethnicity inferred: no self-description. Uses they/them. Prior: The Violence Almanac, The First Church of What's Happening, Blood Sport. Founding editor, Foglifter Press. Black Lawrence = small press. Set in Baltimore.","u":"https://www.miahjeffra.com/"},{"p1":"Man","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Autofiction / hybrid","a":"Joseph Earl Thomas","t":"God Bless You, Otis Spunkmeyer","w":"Center for Fiction","y":2024,"s":"Winner","n":"Philadelphia; Army veteran; worked as an ER tech. MFA Notre Dame + PhD English, Penn. Prior: Sink: A Memoir (2023). Grand Central = Hachette. Autofictional -- protagonist shares his biography.","u":"https://www.josephearlthomas.com/"},{"p1":"Woman","p2":"White","p3":"(not found)","p4":"Big Five","p5":"Prior book, other form","p6":"Literary realism","a":"Rita Bullwinkel","t":"Headshot","w":"Center for Fiction","y":2024,"s":"Shortlist","n":"Race/ethnicity inferred: no self-description. Credential not established: Whiting Award winner, editor at McSweeney's, teaches creative writing at USF -- no degree named in any bio. Prior: Belly Up (2018). Viking = PRH. Booker longlisted.","u":"https://www.ritabullwinkel.com/"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Historical","a":"Ruthvika Rao","t":"The Fertile Earth","w":"Center for Fiction","y":2024,"s":"Shortlist","n":"Born and raised in Telangana, India. MFA Michener Center, UT Austin. Flatiron = Macmillan. Set in 1950s-70s southern India.","u":"https://www.ruthvikarao.com/"},{"p1":"Woman","p2":"Black","p3":"Other graduate degree","p4":"Other / new-model imprint","p5":"First book","p6":"Historical","a":"Mai Sennaar","t":"They Dream in Gold","w":"Center for Fiction","y":2024,"s":"Shortlist","n":"Race/ethnicity inferred: no direct self-description; subject is the African diaspora and the book was acquired by SJP Lit. P4 PROBLEM: SJP Lit is Sarah Jessica Parker's imprint at Zando, an independent founded 2020. Second SJP Lit author in the corpus after Kim Coleman Foote (2023).","u":"https://www.maisennaar.com/"},{"p1":"Woman","p2":"White","p3":"(not found)","p4":"Big Five","p5":"Prior book, other form","p6":"Literary realism","a":"Clare Sestanovich","t":"Ask Me Again","w":"Center for Fiction","y":2024,"s":"Shortlist","n":"Race/ethnicity inferred: no self-description. Credential not established: 5 Under 35 honoree, former New Yorker editor, teaches at Columbia -- no degree named. Prior: Objects of Desire (2021). Knopf = PRH.","u":"https://www.penguinrandomhouse.com/authors/2141119/clare-sestanovich/"},{"p1":"Man","p2":"MENA","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Literary realism","a":"Kaveh Akbar","t":"Martyr!","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Born Tehran 1989; to the US at age 2. Prior: Pilgrim Bell (2021), Calling a Wolf a Wolf (2017), chapbook, two edited anthologies. Poetry editor, The Nation; associate professor, Iowa. Knopf = PRH. National Book Award finalist. Second MENA author in the corpus after Noor Naga.","u":"https://poets.org/poet/kaveh-akbar"},{"p1":"Woman","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Essie Chambers","t":"Swift River","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Race/ethnicity inferred: won the Ernest J. Gaines Award (restricted to African American fiction writers) and NAACP Image Award nominee; no direct self-description. Former TV/film executive at Nickelodeon and BET; producer on the Oscar-shortlisted documentary Descendant. MFA Columbia.","u":"https://essiechambers.com/about/"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Historical","a":"Vanessa Chan","t":"The Storm We Made","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Malaysian, grew up Kuala Lumpur, based Brooklyn. New School MFA 2021. Novel drawn from grandparents' accounts of the Japanese occupation of Malaya. Marysue Rucci Books = S&S imprint. Sold in international auction; 20+ languages.","u":"https://vanessajchan.com/"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Speculative","a":"Tessa Fontaine","t":"The Red Grove","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. MFA Alabama, then most of a PhD at Utah. Former sideshow performer; taught in jails and prisons. Prior: The Electric Woman (FSG, 2018), memoir. FSG = Macmillan.","u":"https://www.tessafontaine.com/"},{"p1":"Woman","p2":"Latino/a/x","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Historical","a":"Marcela Fuentes","t":"Malas","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Self-describes as Chicana. Born and raised Del Rio, Texas. Iowa Writers' Workshop MFA; PhD Georgia State; McCreight Fellow, Wisconsin. Professor of creative writing, TCU. Began as a fairy-tale assignment in an MFA seminar; took 10+ years. Viking = PRH. American Book Award winner.","u":"https://www.marcelafuentes.com/about"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"University press","p5":"First book","p6":"Historical","a":"Parul Kapur","t":"Inside the Mirror","w":"Center for Fiction","y":2024,"s":"Longlist","n":"FIRST UNIVERSITY-PRESS AUTHOR IN THE CORPUS. Born Assam, India; raised in the US; lives Atlanta. MFA Columbia. Journalist and critic; former UN press officer; reporter at Bombay magazine.","u":"https://www.parulkapur.com/author"},{"p1":"Man","p2":"White","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Crime / thriller","a":"Daniel Lefferts","t":"Ways and Means","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Raised upstate New York. MFA Columbia '19; taught writing at Columbia and Rutgers; wrote author profiles for Publishers Weekly. Abrams/Overlook = large indep. Literary thriller set around the 2016 election.","u":"https://www.daniellefferts.com/"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Large independent","p5":"Prior book, other form","p6":"Literary realism","a":"Betsy Lerner","t":"Shred Sisters","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Born 1961; published this at 64. MFA poetry Columbia; PEN Emerging Writer; Tony Godwin Publishing Prize. 15 years an editor, then a literary agent for 30 years. Prior: The Forest for the Trees, Food and Loathing, The Bridge Ladies. Grove = large indep.","u":"https://betsylerner.com/shred-sisters/"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Speculative","a":"Kelly Link","t":"The Book of Love","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Born 1969. MacArthur Fellow 2018; Pulitzer finalist for Get in Trouble. Five prior story collections. Professor at Smith; co-founder of Small Beer Press; bookstore co-owner. Random House = PRH. The corpus's most decorated 'debut' novelist.","u":"https://en.wikipedia.org/wiki/Kelly_Link"},{"p1":"Woman","p2":"White","p3":"(not found)","p4":"Small press / nonprofit","p5":"Prior book, other form","p6":"Historical","a":"Lily Meyer","t":"Short War","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Credential not established: staff writer at The Atlantic, translator and critic -- no degree named. P5 MARGINAL: prior books are translations (Claudia Ulloa Donoso's Little Bird and Ice for Martians), a different kind of authorship the P5 binary handles…","u":"https://www.lilyjmeyer.com/about"},{"p1":"Woman","p2":"Latino/a/x","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Autofiction / hybrid","a":"Melissa Mogollon","t":"Oye","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Colombian American, born Colombia, raised Florida. MFA fiction, Iowa Writers' Workshop; BA George Washington. Teaches at a Rhode Island boarding school. Hogarth = PRH. Told entirely as one-sided phone calls -- coded hybrid for the form. Lambda finalist.","u":"https://www.penguinrandomhouse.com/authors/2273411/melissa-mogollon/"},{"p1":"Woman","p2":"Black","p3":"Other graduate degree","p4":"Big Five","p5":"First book","p6":"Crime / thriller","a":"Iris Mwanza","t":"The Lions' Den","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Self-described Zambian-American. Law degrees from Cornell and University of Zambia; MA and PhD in international relations, Johns Hopkins SAIS. Deputy Director, Gender Equality Division, Gates Foundation. Wrote the novel over nine years of nights and weekends. Graydon House = HarperCollins.","u":"https://irismwanza.com/about"},{"p1":"Man","p2":"Asian American","p3":"(not found)","p4":"Large independent","p5":"Prior book, other form","p6":"Historical","a":"Andrew X. Pham","t":"Twilight Territory","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Vietnamese American, born Phan Thiet, Vietnam. Credential not established: engineering background; Guggenheim Fellow, Whiting Writers' Award, NBCC finalist -- no writing degree named. Prior: Catfish and Mandala (1999, Kiriyama Prize), The Eaves of Heaven, and a translation. Norton = large indep.","u":"https://wwnorton.com/books/9781324064848"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"Prior book, other form","p6":"Autofiction / hybrid","a":"Nicolette Polek","t":"Bitter Water Opera","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Self-described Slovak-American from Northeast Ohio -- P2 directly sourced, not inferred. MFA fiction Maryland + MAR Yale Divinity School. Rona Jaffe Award. Prior: Imaginary Museums (Soft Skull, 2020). Graywolf = small nonprofit. Vignette form.","u":"https://www.graywolfpress.org/books/bitter-water-opera"},{"p1":"Woman","p2":"Asian American","p3":"Other graduate degree","p4":"Large independent","p5":"Prior book, other form","p6":"Autofiction / hybrid","a":"Ery Shin","t":"Spring on the Peninsula","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Korean American, born Ames Iowa 1986, raised Manhattan then Seoul. BA English Princeton; doctorate Oxford. Prior: a study of Gertrude Stein. Assistant professor of English, University of Southern Mississippi. Astra House = large indep. Researched in the Step 4 pilot.","u":"https://www.penguinrandomhouse.com/books/736369/spring-on-the-peninsula-by-ery-shin/"},{"p1":"Nonbinary","p2":"Multiracial / other","p3":"Other graduate degree","p4":"Small press / nonprofit","p5":"First book","p6":"Literary realism","a":"Charlie J. Stephens","t":"A Wounded Deer Leaps Highest","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Self-describes as a queer, non-binary, mixed-race writer from the Pacific Northwest -- P1 and P2 both directly sourced. Born Salem, Oregon. MA SF State '09. Has worked as bike messenger, wilderness guide, high school English teacher, shark diver; owns Sea Wolf Books. Torrey House = small nonprofit.","u":"https://charliejstephenswriting.com/"},{"p1":"Man","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"August Thompson","t":"Anyone's Ghost","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Raised rural New Hampshire, then West LA. MFA NYU as a Goldwater Fellow; taught by Joyce Carol Oates. Taught English in Spain. Penguin Press = PRH. Lambda finalist.","u":"https://www.penguinrandomhouse.com/authors/2292541/august-thompson/"},{"p1":"Woman","p2":"White","p3":"Other graduate degree","p4":"Large independent","p5":"First book","p6":"Historical","a":"Sasha Vasilyuk","t":"Your Presence Is Mandatory","w":"Center for Fiction","y":2024,"s":"Longlist","n":"Race/ethnicity inferred: Ukrainian Jewish family; grew up between Ukraine and Russia, immigrated to the US at 13. BA UC Berkeley (Comp Lit '05), MA Journalism NYU. Journalist for NYT, CNN, TIME. Based on her grandfather's letter to the KGB. Bloomsbury = large indep.","u":"https://www.sashavasilyuk.com/about"},{"p1":"Man","p2":"White","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Literary realism","a":"Michael Deagler","t":"Early Sobrieties","w":"PEN/Hemingway","y":2025,"s":"Winner","n":"Race/ethnicity inferred: no self-description. Bucks County PA native. National Magazine Award and O. Henry Prize. Astra House = large indep. Also Carnegie Medal and Waterstones Debut Prize longlists.","u":"https://www.michaeldeagler.com/about"},{"p1":"Woman","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Autofiction / hybrid","a":"Venita Blackburn","t":"Dead in Long Beach, California","w":"PEN/Hemingway","y":2025,"s":"Finalist","n":"Race/ethnicity inferred: from Compton; founder of Live, Write (free workshops for communities of colour); no direct self-description. Born LA 1983. Prior: Black Jesus and Other Superheroes (2017), How to Wrestle a Girl (2021). Assoc prof, Fresno State. MCD/FSG = Macmillan.","u":"https://en.wikipedia.org/wiki/Venita_Blackburn"},{"p1":"Man","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Samuel Kolawole","t":"The Road to the Salt Sea","w":"PEN/Hemingway","y":2025,"s":"Finalist","n":"MOST CREDENTIALED AUTHOR IN THE CORPUS: three separate writing degrees. Born and raised Ibadan, Nigeria. Asst prof of English and African Studies, Penn State. 2025 Whiting Award. Amistad = HarperCollins. Migration narrative Nigeria to Libya to the Mediterranean.","u":"https://www.whiting.org/awards/winners/samuel-kolawole"},{"p1":"Man","p2":"White","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"First book","p6":"Crime / thriller","a":"Karol Lagodzki","t":"Controlled Conversations","w":"PEN/Hemingway","y":2025,"s":"Finalist","n":"MOST IMPROBABLE PATH IN THE CORPUS. P2 INFERRED. Native of Poland; self-describes as an exophonic author writing in a non-native language. Milford House Press is an imprint of Sunbury Press, a genuinely small operation.","u":"https://www.sunburypress.com/collections/karol-lagodzki"},{"p1":"Man","p2":"(not found)","p3":"(not found)","p4":"University press","p5":"First book","p6":"Literary realism","a":"Darrell Kinsey","t":"Natch","w":"Center for Fiction","y":2025,"s":"Winner","n":"RESEARCHED IN THE STEP 4 PILOT -- the corpus's thinnest bio. P2 and Credential not established: the fullest available bio says only that he has published short fiction in NOON, won a Pushcart Prize, and lives in Watkinsville, Georgia. A prize WINNER with a 4/6 fill rate.","u":"https://uipress.uiowa.edu/books/natch"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Colwill Brown","t":"We Pretty Pieces of Flesh","w":"Center for Fiction","y":2025,"s":"Shortlist","n":"Race/ethnicity inferred: no self-description. Nationality edge case: born and raised Doncaster, South Yorkshire; now US-based. Michener Fellowship. Winner of the 2025 BBC National Short Story Award; Goldsmiths Prize shortlist. Written in Doncaster dialect. Holt = Macmillan.","u":"https://www.barnesandnoble.com/w/we-pretty-pieces-of-flesh-colwill-brown/1145317478"},{"p1":"Man","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Speculative","a":"Rickey Fayne","t":"The Devil Three Times","w":"Center for Fiction","y":2025,"s":"Shortlist","n":"Self-described: his writing embodies his Black, Southern, over-churched upbringing. From rural West Tennessee. Kimbilio, Tin House, MacDowell, Yaddo. Little, Brown = Hachette. Eight generations of a Black family visited by the Devil; PEN Open Book finalist.","u":"https://communityofwriters.org/bio/rickey-fayne/"},{"p1":"Man","p2":"Black","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Speculative","a":"Justin Haynes","t":"Ibis","w":"Center for Fiction","y":2025,"s":"Shortlist","n":"Race/ethnicity inferred: born Port of Spain, Trinidad and Tobago, later Brooklyn; no direct racial self-description. MFA Notre Dame, further graduate study at Vanderbilt. Assoc prof of English, Oglethorpe. Overlook is an Abrams imprint.","u":"https://bookshop.org/p/books/ibis-justin-haynes/a713ae146b9292bf"},{"p1":"Man","p2":"Multiracial / other","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Alejandro Heredia","t":"Loca","w":"Center for Fiction","y":2025,"s":"Shortlist","n":"Self-described queer Afro-Dominican writer from the Bronx -- P2 directly sourced. Value spans Black and Latino, like Jamie Figueroa (2021). Born Dominican Republic. MFA Hunter '23; started the novel at VONA in 2018. Former community organizer. S&S.","u":"https://blackmountaininstitute.org/fellow/alejandro-heredia/"},{"p1":"Woman","p2":"MENA","p3":"MFA / CW grad degree","p4":"Large independent","p5":"Prior book, other form","p6":"Literary realism","a":"Mariam Rahmani","t":"Liquid","w":"Center for Fiction","y":2025,"s":"Shortlist","n":"Iranian-Indian American. PhD UCLA, MFA Columbia, degrees from Princeton and Oxford; teaches at Bennington. P5 MARGINAL: prior book is a translation from Farsi (Mahsa Mohebali's In Case of Emergency, a New Yorker Best Book of 2022) -- same category problem as Lily Meyer (2024).","u":"https://www.hachettebookgroup.com/titles/mariam-rahmani/liquid/9781643756509/"},{"p1":"Woman","p2":"Asian American","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"Prior book, other form","p6":"Autofiction / hybrid","a":"Shubha Sunder","t":"Optional Practical Training","w":"Center for Fiction","y":2025,"s":"Shortlist","n":"Born and raised Bangalore, India; moved to the US for Bryn Mawr (physics major, creative writing minor), then BU MFA. Prior: Boomtown Girl (Black Lawrence, 2023), won the St. Lawrence Book Award. 2025 Whiting Award. Teaches in the UMass Boston MFA. Graywolf = small nonprofit.","u":"https://en.wikipedia.org/wiki/Shubha_Sunder"},{"p1":"Woman","p2":"MENA","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Literary realism","a":"Aria Aber","t":"Good Girl","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Born Munster, Germany 1991 to Afghan refugee parents; writes in her third language after Farsi and German. Prior: Hard Damage (2019), Prairie Schooner Book Prize and Whiting Award. Former Stegner Fellow; asst prof, University of Vermont. Hogarth = PRH. Women's Prize shortlist.","u":"https://www.ariaaber.com/about"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Literary realism","a":"Evanthia Bromiley","t":"Crown","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Lives Durango, Colorado; works with young writers in impacted schools. NBCC John Leonard Prize finalist. Grove = large indep. Three days before the eviction of a pregnant single mother from a Southwest trailer park.","u":"https://evanthiabromiley.com/bio/"},{"p1":"Woman","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Addie E. Citchens","t":"Dominion","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: Jackson State (HBCU) graduate, Callaloo fellow, subject is a Black Mississippi family; no direct self-description. Credential inferred: bios say she studied in the FSU Creative Writing Program without naming a completed degree. Born Clarksdale, Mississippi.","u":"https://www.bookweb.org/news/indies-introduce-qa-addie-e-citchens-1632153"},{"p1":"Man","p2":"White","p3":"Other graduate degree","p4":"Big Five","p5":"Prior book, other form","p6":"Literary realism","a":"Michael Clune","t":"Pan","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Literary scholar; Knight Professor of the Humanities at Case Western, now at Ohio State's Chase Center. Guggenheim Fellow. Prior: White Out (2013), Gamelife (2015), plus three academic books including A Defense of Judgment. Penguin Press = PRH.","u":"http://www.michaelwclune.com/about"},{"p1":"Nonbinary","p2":"White","p3":"(not found)","p4":"Large independent","p5":"Prior book, other form","p6":"Literary realism","a":"Lydi Conklin","t":"Songs of No Provenance","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Uses they/them. Race/ethnicity inferred: no self-description. Credential not established: Stegner and Rona Jaffe fellowships, has taught at Vanderbilt, but no degree named in any bio. Prior: Rainbow Rainbow (2022), Story Prize and PEN/Bingham longlists; also draws comics for The New Yorker.","u":"https://books.catapult.co/bookauthor/lydi-conklin/"},{"p1":"Woman","p2":"Multiracial / other","p3":"(not found)","p4":"Large independent","p5":"Prior book, other form","p6":"Speculative","a":"Yrsa Daley-Ward","t":"The Catch","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Self-described as of mixed Jamaican and Nigerian heritage -- P2 directly sourced. Nationality edge case: born Chorley, Lancashire 1989; splits time between LA and New York. Credential not established: spoken-word poet, model and actor; no academic credential.","u":"https://www.yrsadaleyward.com/about"},{"p1":"Woman","p2":"Latino/a/x","p3":"(not found)","p4":"Large independent","p5":"Prior book, other form","p6":"Literary realism","a":"Jaquira Diaz","t":"This Is the Only Kingdom","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Self-described queer Afro-Latina, born Puerto Rico, raised between Humacao, Fajardo and Miami Beach -- value spans Black and Latino. Credential not established: teaches in the Columbia writing program but no degree named. Prior: Ordinary Girls (2019), Whiting Award. Algonquin = large indep.","u":"https://www.jaquiradiaz.com/about.html"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Autofiction / hybrid","a":"Virginia Evans","t":"The Correspondent","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. BA James Madison, MPhil creative writing Trinity College Dublin. Lives Winston-Salem NC. Wrote seven unpublished novels before this one. Epistolary form. Crown = PRH. Reached #1 on the NYT fiction list in Feb 2026 -- a slow-burn word-of-mouth bestseller.","u":"https://en.wikipedia.org/wiki/The_Correspondent_(novel)"},{"p1":"Man","p2":"Indigenous (Native American)","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Speculative","a":"Carson Faust","t":"If the Dead Belong Here","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Self-described two-spirit and an enrolled member of the Edisto Natchez-Kusso Tribe of South Carolina -- P2 directly sourced. P1 NOTE: two-spirit; uses he/him. Grew up South Carolina and Wisconsin. Program officer at the Northwest Area Foundation. Viking = PRH. Native American Southern Gothic.","u":"https://www.nwaf.org/staff/carson-faust/"},{"p1":"Woman","p2":"White","p3":"MFA / CW grad degree","p4":"Big Five","p5":"Prior book, other form","p6":"Speculative","a":"Kate Folk","t":"Sky Daddy","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Born Iowa City; NYU undergrad; MFA USF 2011. Stegner Fellow 2019-21. Prior: Out There (Random House, 2022). California Book Award Silver Medal. Random House = PRH.","u":"https://www.katefolk.com/about-1"},{"p1":"Man","p2":"White","p3":"MFA / CW grad degree","p4":"Large independent","p5":"First book","p6":"Speculative","a":"Alex Foster","t":"Circular Motion","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. MFA NYU, fiction editor of Washington Square Review; now an editor at Henry Holt and Metropolitan. Previously studied economics at Chicago and researched for the US government and the World Bank's Gender Innovation Lab in West Africa.","u":"https://groveatlantic.com/author/alex-foster/"},{"p1":"Man","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Rob Franklin","t":"Great Black Hope","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Born and raised Atlanta; Stanford BA; MFA NYU (began the novel there in 2020). Cofounder of Art for Black Lives; Kimbilio Fellow; teaches at the School of Visual Arts. Won the Ernest J. Gaines Award.","u":"https://www.simonspeakers.com/author/franklin-rob/"},{"p1":"Woman","p2":"Latino/a/x","p3":"(not found)","p4":"Big Five","p5":"First book","p6":"Speculative","a":"Nicky Gonzalez","t":"Mayra","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: from Hialeah, the Cuban neighbourhood west of Miami, and the novel is rooted in Cuban-American life; no direct self-description. Credential not established: fellowships from Elizabeth George, Granum, Millay Arts, Lighthouse Works, Hambidge -- no degree named. Vintage = PRH.","u":"https://www.penguinrandomhouse.com/books/746030/mayra-by-nicky-gonzalez/"},{"p1":"Man","p2":"Asian American","p3":"(not found)","p4":"Big Five","p5":"First book","p6":"Crime / thriller","a":"Rav Grewal-Kok","t":"The Snares","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Punjabi; grew up in Hong Kong and on Vancouver Island, now Los Angeles. Named the protagonist after his mother's maiden name and her father's Punjabi village. Credential not established: NEA fellowship in prose and fiction editor at Fence, but no degree named. Random House = PRH.","u":"https://www.ravgrewalkok.com/about"},{"p1":"Woman","p2":"White","p3":"(not found)","p4":"Other / new-model imprint","p5":"First book","p6":"Literary realism","a":"Emily St. James","t":"Woodworking","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Trans woman. Race/ethnicity inferred: no self-description. Credential not established: cultural critic (NYT, Vox, AV Club) and TV writer on Yellowjackets; no writing degree. P4 PROBLEM: Crooked Media Reads is a Zando imprint -- the fourth curated new-model imprint in the corpus.","u":"https://zandoprojects.com/books/woodworking/"},{"p1":"Man","p2":"Black","p3":"MFA / CW grad degree","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Doug Jones","t":"The Fantasies of Future Things","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: Morehouse College (HBCU) graduate; poetry published in Sojourner: Black Gay Voices in the Age of AIDS; subject is two Black men in Atlanta; no direct self-description. MFA Columbia. Inaugural Lambda Literary Fellow 2007, studied with Dorothy Allison.","u":"https://www.simonandschuster.com/books/The-Fantasies-of-Future-Things/Doug-Jones/9781668016282"},{"p1":"Woman","p2":"White","p3":"(not found)","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Honor Jones","t":"Sleep","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Credential not established: senior editor at The Atlantic, previously a senior staff editor at the NYT Opinion desk; no degree named. Riverhead = PRH. Washington Post Notable Book.","u":"https://www.penguinrandomhouse.com/books/761973/sleep-by-honor-jones/"},{"p1":"Woman","p2":"Asian American","p3":"(not found)","p4":"Big Five","p5":"First book","p6":"Speculative","a":"Susanna Kwan","t":"Awake in the Floating City","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: won the Asian American Award for Literature in Adult Fiction; no direct self-description. Credential not established: publisher bio is one line -- an artist and writer from San Francisco. Pantheon = PRH. Climate fiction;","u":"https://susannakwan.com/"},{"p1":"Man","p2":"White","p3":"(not found)","p4":"Large independent","p5":"First book","p6":"Historical","a":"Phil Melanson","t":"Florenzer","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Credential not established: no education named in any available bio. Liveright = Norton, large indep. Renaissance Florence; Leonardo da Vinci, Lorenzo de' Medici and Francesco Salviati.","u":"https://wwnorton.com/books/9781324095033"},{"p1":"Woman","p2":"White","p3":"(not found)","p4":"Big Five","p5":"First book","p6":"Literary realism","a":"Erica Peplin","t":"Work Nights","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Credential not established: no degree named. From Detroit, based Brooklyn; age 35 at publication. Worked in the NYT advertising department 2015-16, then as a shipping clerk, high school custodian and restaurant server. S&S.","u":"https://www.ericapeplin.com/about"},{"p1":"Man","p2":"White","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"Prior book, other form","p6":"Historical","a":"Ethan Rutherford","t":"North Sun: Or, the Voyage of the Whaleship Esther","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: no self-description. Born Seattle; Williams BA, Minnesota MFA; assoc prof of English, Trinity College CT. Prior: The Peripatetic Coffin (Ecco, 2013) and Farthest South (Deep Vellum, 2020). A Strange Object / Deep Vellum = small nonprofit.","u":"https://www.ethanrutherford.com/about"},{"p1":"Woman","p2":"Black","p3":"MFA / CW grad degree","p4":"Small press / nonprofit","p5":"First book","p6":"Speculative","a":"Kionna Walker LeMalle","t":"Behind the Waterline","w":"Center for Fiction","y":2025,"s":"Longlist","n":"Race/ethnicity inferred: Xavier University of Louisiana (HBCU) graduate; novel set in New Orleans's Third Ward; no direct self-description. BA Xavier, MEd New Orleans, MFA Houston Christian. Executive writer at UH-Downtown; teaches in HCU's Department of Narrative Arts.","u":"https://blairpub.com/shop/p/behind-the-waterline"}];
+
+const PARAMS = [
+  {k:'p1', label:'Gender', group:'you', values:['Man','Woman','Nonbinary']},
+  {k:'p2', label:'Race / ethnicity', group:'you', values:['White','Black','Latino/a/x','Asian American','Indigenous (Native American)','Pacific Islander / Native Hawaiian','MENA','Multiracial / other']},
+  {k:'p3', label:'Creative-writing credential', group:'you', values:['MFA / CW grad degree','Other graduate degree','No graduate degree']},
+  {k:'p5', label:'Prior book', group:'you', values:['First book','Prior book, other form']},
+  {k:'p4', label:'Publisher you imagine', group:'choice', values:['Big Five','Large independent','Small press / nonprofit','University press','Other / new-model imprint']},
+  {k:'p6', label:'Mode you imagine writing in', group:'choice', values:['Literary realism','Speculative','Historical','Crime / thriller','Autofiction / hybrid']}
+];
+const ORDER = ['p1','p2','p3','p5','p4','p6'];
+const CHOICE = new Set(['p4','p6']);
+
+const NICE = {
+  'MFA / CW grad degree':'MFA or creative-writing graduate degree',
+  'Other graduate degree':'A graduate degree in something else',
+  'No graduate degree':'No graduate degree',
+  'First book':'This would be my first book',
+  'Prior book, other form':'I have published a book in another form',
+  'Big Five':'A Big Five imprint',
+  'Large independent':'A large independent',
+  'Small press / nonprofit':'A small press or nonprofit',
+  'University press':'A university press',
+  'Other / new-model imprint':'A curated or new-model imprint',
+  'Literary realism':'Literary realism',
+  'Speculative':'Speculative or fantastic',
+  'Historical':'Historical',
+  'Crime / thriller':'Crime, thriller or suspense',
+  'Autofiction / hybrid':'Autofiction or formally hybrid',
+  'Indigenous (Native American)':'Indigenous (Native American)',
+  'Pacific Islander / Native Hawaiian':'Pacific Islander / Native Hawaiian',
+  'Multiracial / other':'Multiracial or other',
+  'MENA':'MENA'
+};
+const SHORT = {
+  'MFA / CW grad degree':'MFA','Other graduate degree':'Other grad degree','No graduate degree':'No grad degree',
+  'Large independent':'Large independent','Small press / nonprofit':'Small press',
+  'University press':'University press','Other / new-model imprint':'Curated imprint',
+  'Prior book, other form':'Prior book','Literary realism':'Literary realism',
+  'Speculative':'Speculative','Crime / thriller':'Crime / thriller','Autofiction / hybrid':'Autofiction / hybrid',
+  'Indigenous (Native American)':'Indigenous','Pacific Islander / Native Hawaiian':'Pacific Islander'
+};
+const nice = v => NICE[v] || v;
+const shrt = v => SHORT[v] || v;
+const UNKNOWN = '(not found)';
+
+const sel = {p1:null,p2:null,p3:null,p4:null,p5:null,p6:null};
+
+/* ---------- build the controls ---------- */
+function buildPanels(){
+  const mk = p => {
+    const counts = {};
+    p.values.forEach(v => counts[v] = AUTHORS.filter(a => a[p.k] === v).length);
+    const chips = p.values.map(v => `
+      <label class="chip">
+        <input type="radio" name="${p.k}" value="${v.replace(/"/g,'&quot;')}">
+        <span>${nice(v)}<span class="chipcount">${counts[v]}</span></span>
+      </label>`).join('');
+    return `<fieldset data-k="${p.k}"><legend>${p.label}</legend><div class="chips">${chips}</div></fieldset>`;
+  };
+  document.getElementById('panel-you').innerHTML =
+    PARAMS.filter(p => p.group === 'you').sort((a,b)=>ORDER.indexOf(a.k)-ORDER.indexOf(b.k)).map(mk).join('');
+  document.getElementById('panel-choice').innerHTML =
+    PARAMS.filter(p => p.group === 'choice').map(mk).join('');
+
+  document.querySelectorAll('input[type=radio]').forEach(inp => {
+    inp.addEventListener('change', () => { sel[inp.name] = inp.value; writeHash(); render(); });
+  });
+}
+
+/* ---------- matching ---------- */
+function chosenKeys(){ return ORDER.filter(k => sel[k]); }
+
+// exact: every chosen parameter equals the author's coded value
+function exactMatches(keys){
+  return AUTHORS.filter(a => keys.every(k => a[k] === sel[k]));
+}
+// possible: matches on every chosen parameter that is coded, but at least one is unknown
+function possibleMatches(keys){
+  return AUTHORS.filter(a =>
+    keys.some(k => a[k] === UNKNOWN) &&
+    keys.every(k => a[k] === UNKNOWN || a[k] === sel[k])
+  );
+}
+
+/* ---------- rendering ---------- */
+function cfgLine(){
+  return ORDER.map(k => {
+    const p = PARAMS.find(x => x.k === k);
+    if(!sel[k]) return `<span class="unset">${p.label.toLowerCase()}</span>`;
+    return CHOICE.has(k) ? `<span class="pick">${shrt(sel[k])}</span>` : `<em>${shrt(sel[k])}</em>`;
+  }).join(' <span style="opacity:.45">·</span> ');
+}
+
+function matchCard(a, isPossible){
+  const stage = a.s === 'Winner' ? 'Winner' : a.s;
+  const prize = a.w === 'PEN/Hemingway' ? 'PEN/Hemingway' : 'Center for Fiction';
+  const unknowns = ORDER.filter(k => a[k] === UNKNOWN)
+    .map(k => PARAMS.find(x => x.k === k).label.toLowerCase());
+  return `<div class="match">
+    <div class="who">
+      <span class="name">${a.a}</span>
+      <span class="book">${a.t}</span>
+      <span class="badge ${a.s === 'Winner' ? 'win' : ''}">${stage}</span>
+      ${isPossible ? '<span class="badge maybe">Possible match</span>' : ''}
+    </div>
+    <div class="meta">${prize} · ${a.y} · ${shrt(a.p4)} · ${shrt(a.p6)} · ${shrt(a.p5)} · ${shrt(a.p3)}</div>
+    ${isPossible ? `<div class="note">Matches you on everything recorded, but this author's ${unknowns.join(' and ')} could not be established from public sources.</div>` : ''}
+    ${a.n ? `<div class="note">${a.n}</div>` : ''}
+    ${a.u ? `<div class="meta"><a href="${a.u}" target="_blank" rel="noopener">${a.u}</a></div>` : ''}
+  </div>`;
+}
+
+function renderVerdict(keys){
+  const v = document.getElementById('verdict');
+  if(keys.length < 6){
+    const left = 6 - keys.length;
+    v.innerHTML = `<div class="verdict"><h3>Choose ${left} more ${left === 1 ? 'value' : 'values'}</h3>
+      <p>Set every one of the six parameters and this panel will tell you whether any of the 144 listed authors shares your exact configuration.</p></div>`;
+    return;
+  }
+  const hits = exactMatches(keys);
+  const maybes = possibleMatches(keys);
+  if(hits.length){
+    v.innerHTML = `<div class="verdict hit">
+        <h3>${hits.length} author${hits.length > 1 ? 's' : ''} on these lists ${hits.length > 1 ? 'share' : 'shares'} your exact configuration</h3>
+        <p>All six parameters match. ${hits.length > 1 ? 'These are' : 'This is'} the closest documented precedent for the book you are describing.</p>
+      </div>
+      <div class="matchlist">${hits.map(a => matchCard(a, false)).join('')}</div>
+      ${maybes.length ? `<div class="verdict"><p style="font-size:13px;color:var(--muted);margin:16px 0 0">
+        ${maybes.length} further author${maybes.length > 1 ? 's' : ''} may also match — ${maybes.length > 1 ? 'their' : 'a'} record${maybes.length > 1 ? 's are' : ' is'} incomplete on one parameter.</p></div>
+        <div class="matchlist">${maybes.map(a => matchCard(a, true)).join('')}</div>` : ''}`;
+  } else {
+    v.innerHTML = `<div class="miss">
+        <h3>No exact match</h3>
+        <p>No author was long-listed, short-listed, named a finalist or awarded by the PEN/Hemingway Award for Debut Novel or the Center for Fiction First Novel Prize since 2021 matching this configuration. This suggests it's an uncommon configuration, which you could potentially use to your advantage! More research about this configuration will benefit you as you continue your path to publishing your first novel.</p>
+      </div>
+      ${maybes.length ? `<div class="verdict"><p style="font-size:13px;color:var(--muted);margin:0">
+        ${maybes.length} author${maybes.length > 1 ? 's' : ''} may nonetheless match: ${maybes.length > 1 ? 'they match' : 'this author matches'} you on every parameter that could be established, with one value missing from the public record.</p></div>
+        <div class="matchlist">${maybes.map(a => matchCard(a, true)).join('')}</div>` : ''}`;
+  }
+}
+
+function renderAway(keys){
+  const el = document.getElementById('away');
+  if(keys.length < 6){ el.innerHTML = ''; return; }
+  const groups = ORDER.map(k => {
+    const p = PARAMS.find(x => x.k === k);
+    const alts = p.values.filter(v => v !== sel[k]).map(v => {
+      const n = AUTHORS.filter(a => ORDER.every(kk => kk === k ? a[kk] === v : a[kk] === sel[kk])).length;
+      return {v, n};
+    }).filter(x => x.n > 0).sort((a,b) => b.n - a.n);
+    return {p, alts};
+  }).filter(g => g.alts.length);
+
+  if(!groups.length){
+    el.innerHTML = `<div class="away"><h4>Nothing is one step away</h4>
+      <p class="sub">Changing any single parameter still produces no match. Your configuration sits in an entirely unoccupied region of the field — the rarest result this tool can give.</p></div>`;
+    return;
+  }
+  const choiceFirst = groups.sort((a,b) => (CHOICE.has(b.p.k) ? 1 : 0) - (CHOICE.has(a.p.k) ? 1 : 0));
+  el.innerHTML = `<div class="away">
+    <h4>One step away</h4>
+    <p class="sub">${choiceFirst.some(g => CHOICE.has(g.p.k))
+      ? 'Change exactly one parameter and these configurations do have precedents. The groups marked <em style="font-style:normal;color:var(--brass)">your choice</em> come first, because a different press or a different mode is a decision still open to you.'
+      : 'Change exactly one parameter and these configurations do have precedents — but not by changing the press or the mode. Every route out of this cell runs through a parameter you do not choose.'} Click any value to try it.</p>
+    <div class="alts">${choiceFirst.map(g => `
+      <div class="altgroup">
+        <div class="altlab">${g.p.label}${CHOICE.has(g.p.k) ? ' — your choice' : ''}</div>
+        <div class="altrow">${g.alts.map(x =>
+          `<button class="alt" type="button" data-k="${g.p.k}" data-v="${x.v.replace(/"/g,'&quot;')}">${nice(x.v)} <b>${x.n}</b></button>`
+        ).join('')}</div>
+      </div>`).join('')}</div>
+  </div>`;
+  el.querySelectorAll('.alt').forEach(b => b.addEventListener('click', () => {
+    sel[b.dataset.k] = b.dataset.v;
+    syncInputs(); writeHash(); render();
+    document.getElementById('result').scrollIntoView({behavior:'smooth', block:'start'});
+  }));
+}
+
+function renderShares(keys){
+  const el = document.getElementById('shares');
+  if(!keys.length){ el.innerHTML = ''; return; }
+  const rows = ORDER.filter(k => sel[k]).map(k => {
+    const p = PARAMS.find(x => x.k === k);
+    const n = AUTHORS.filter(a => a[k] === sel[k]).length;
+    return {label:p.label, val:sel[k], n, pct:100 * n / AUTHORS.length};
+  });
+  const max = Math.max(...rows.map(r => r.n), 1);
+  el.innerHTML = `<table>
+    <thead><tr><th>Each value on its own</th><th></th><th class="n">of 144</th></tr></thead>
+    <tbody>${rows.map(r => `<tr>
+      <td>${shrt(r.val)}<div style="font-size:11px;color:var(--faint)">${r.label}</div></td>
+      <td style="width:42%"><div class="bar"><i style="width:${(100 * r.n / max).toFixed(1)}%"></i></div></td>
+      <td class="n">${r.n} · ${r.pct.toFixed(0)}%</td>
+    </tr>`).join('')}</tbody></table>`;
+}
+
+function render(){
+  const keys = chosenKeys();
+  const n = AUTHORS.filter(a => keys.every(k => a[k] === sel[k])).length;
+  document.getElementById('count').textContent = n;
+  document.getElementById('countlabel').textContent =
+    keys.length === 0 ? 'authors in the corpus — choose a value in each of the six groups'
+    : keys.length < 6 ? `author${n === 1 ? '' : 's'} match what you have chosen so far (${keys.length} of 6 set)`
+    : `author${n === 1 ? '' : 's'} match all six`;
+  document.getElementById('cfgline').innerHTML = cfgLine();
+  renderVerdict(keys);
+  renderAway(keys);
+  renderShares(keys);
+}
+
+/* ---------- state in the URL ---------- */
+function writeHash(){
+  const parts = ORDER.filter(k => sel[k]).map(k => k + '=' + encodeURIComponent(sel[k]));
+  history.replaceState(null, '', parts.length ? '#' + parts.join('&') : location.pathname + location.search);
+}
+function readHash(){
+  const h = location.hash.replace(/^#/, '');
+  if(!h) return;
+  h.split('&').forEach(pair => {
+    const [k, v] = pair.split('=');
+    const p = PARAMS.find(x => x.k === k);
+    if(p && v){ const dv = decodeURIComponent(v); if(p.values.includes(dv)) sel[k] = dv; }
+  });
+}
+function syncInputs(){
+  document.querySelectorAll('input[type=radio]').forEach(i => { i.checked = (sel[i.name] === i.value); });
+}
+
+/* ---------- buttons ---------- */
+document.getElementById('reset').addEventListener('click', () => {
+  ORDER.forEach(k => sel[k] = null); syncInputs(); writeHash(); render();
+});
+document.getElementById('rand').addEventListener('click', () => {
+  PARAMS.forEach(p => sel[p.k] = p.values[Math.floor(Math.random() * p.values.length)]);
+  syncInputs(); writeHash(); render();
+});
+document.getElementById('share').addEventListener('click', async () => {
+  const msg = document.getElementById('sharemsg');
+  try{
+    await navigator.clipboard.writeText(location.href);
+    msg.textContent = 'Link copied.';
+  }catch(e){
+    msg.textContent = 'Copy the address bar — the URL holds your configuration.';
+  }
+  setTimeout(() => msg.textContent = '', 4000);
+});
+
+document.getElementById('foot').innerHTML =
+  `Corpus: all winners, finalists, shortlistees and longlistees of the PEN/Hemingway Award for Debut Novel and the
+   Center for Fiction First Novel Prize, award years 2021–2025 — ${AUTHORS.length} unique authors, each coded on six
+   parameters. Race/ethnicity is inferred where no author self-description exists, and ${AUTHORS.filter(a=>a.p3===UNKNOWN).length}
+   authors have no findable creative-writing credential; those authors can appear only as possible matches, never exact ones.
+   An empty result means no documented precedent on these two lists in five years — not that the configuration is impossible,
+   and not that it is disfavoured. With 3,600 formally possible configurations and 144 authors, most of the field is empty
+   for arithmetic reasons alone.`;
+
+buildPanels();
+readHash();
+syncInputs();
+render();
+</script>
+</body>
+</html>
