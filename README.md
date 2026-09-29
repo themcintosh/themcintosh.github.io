@@ -24,7 +24,7 @@ Located at `/rice-field` - An interactive morphological field for national rice 
 
 ## Swadesh and Phrases deployment
 
-Swadesh and Phrases are deployed as their own separate Vercel projects (not part of the GitHub Pages site this repo serves), each with its own serverless functions and configuration in `swadesh/` and `phrases/` respectively. See each project's own files (`phrases/README.md`, `phrases/DEPLOYMENT.md`, `phrases/env.example`) for their setup details.
+Swadesh and Phrases are deployed as their own separate Vercel projects (not part of the GitHub Pages site this repo serves), each with its own serverless functions and configuration in `swadesh/` and `phrases/` respectively. See each project's own files (`phrases/README.md`, `phrases/DEPLOYMENT.md`, `phrases/.env.example`, `swadesh/README.md`, `swadesh/.env.example`) for their setup details.
 
 ## License
 
