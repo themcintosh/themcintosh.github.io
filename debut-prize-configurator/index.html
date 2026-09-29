@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Explore the configuration space of debut novelists listed for the PEN/Hemingway Award and the Center for Fiction First Novel Prize, 2021-2025.">
-<title>Debut Prize Configurator</title>
+<title>Debut Novel Prize Configurator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;0,7..72,700;1,7..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -48,6 +48,8 @@ body{
 
 /* header */
 header{border-bottom:1px solid var(--rule); padding:clamp(34px,5vw,62px) 0 26px; margin-bottom:30px}
+.backLink{display:inline-block;margin-bottom:12px;font-size:13px;color:var(--muted);text-decoration:none}
+.backLink:hover{color:var(--ink)}
 .eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; letter-spacing:.14em;
   text-transform:uppercase; color:var(--muted); margin:0 0 14px}
 h1{font-family:Literata,Georgia,serif; font-weight:700; font-size:clamp(31px,5vw,50px);
@@ -184,8 +186,9 @@ footer a{color:var(--occ)}
 <body>
 <div class="wrap">
 <header>
+  <a class="backLink" href="/">&larr; Home</a>
   <p class="eyebrow">PEN/Hemingway Award for Debut Novel · Center for Fiction First Novel Prize · 2021–2025</p>
-  <h1>Debut Prize Configurator</h1>
+  <h1>Debut Novel Prize Configurator</h1>
   <p class="dek">Every author longlisted, shortlisted, named a finalist or awarded by these two prizes between 2021 and 2025 — 144 in all — has been coded on six parameters. Four describe who the author is; two describe the path their book took to print.</p>
   <p class="dek">Set the first four to your own situation. Set the last two to what you imagine for your own first novel. The tool tells you whether anyone with that exact configuration has appeared on these lists.</p>
 </header>
