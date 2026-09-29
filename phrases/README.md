@@ -95,6 +95,7 @@ Then visit `http://localhost:3000` in your browser.
 │   ├── generate-phrase.js  # Serverless function for phrase generation
 │   └── interpret.js        # Serverless function for AI interpretation
 ├── vercel.json             # Vercel configuration
+├── .env.example            # Environment variables to set
 ├── DEPLOYMENT.md           # Detailed deployment guide
 └── README.md              # This file
 ```
